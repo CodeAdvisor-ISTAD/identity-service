@@ -10,6 +10,7 @@ import jakarta.mail.internet.MimeMessage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,6 +24,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 public class EmailVerificationTokenServiceImpl implements EmailVerificationTokenService {
+
+    @Value("${spring.mail.username}")
+    private String botEmail;
 
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final UserRepository userRepository;
@@ -56,7 +60,11 @@ public class EmailVerificationTokenServiceImpl implements EmailVerificationToken
 
         // check if user attempts to verify exists or not
         User foundUser = userRepository.findByUsernameAndIsEnabledTrue(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unsuccessfully creation of confirmation link!"));
+                .orElseThrow(() -> new ResponseStatusException  (HttpStatus.NOT_FOUND, "Unsuccessfully creation of confirmation link!"));
+
+        if (!foundUser.getEmailVerified()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is already verified");
+        }
 
         emailVerificationTokenRepository.deleteByUser(foundUser);
         generate(foundUser);
@@ -88,10 +96,12 @@ public class EmailVerificationTokenServiceImpl implements EmailVerificationToken
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
 
         try {
+            mimeMessageHelper.setFrom(botEmail);
             mimeMessageHelper.setTo(user.getEmail());
             mimeMessageHelper.setSubject("Account Verification");
             mimeMessageHelper.setText(emailVerificationToken.getToken());
             javaMailSender.send(mimeMessage);
+            log.info("Email has been sent to {}", user.getEmail());
         } catch (MessagingException e) {
             log.error(e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");

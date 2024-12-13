@@ -6,6 +6,7 @@ import lombok.Builder;
 public record UserResponse(
 
     String username,
+    String uuid,
     String email,
     String profileImage,
     String familyName,

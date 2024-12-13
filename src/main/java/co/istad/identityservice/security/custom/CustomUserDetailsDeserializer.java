@@ -46,8 +46,9 @@ public class CustomUserDetailsDeserializer extends JsonDeserializer<CustomUserDe
         boolean credentialsNonExpired = readJsonNode(userJsonNode, "credentialsNonExpired").asBoolean();
         boolean accountNonLocked = readJsonNode(userJsonNode, "accountNonLocked").asBoolean();
 
-        String familyName = readJsonNode(userJsonNode, "familyName").asText();
-        String givenName = readJsonNode(userJsonNode, "givenName").asText();
+//        String familyName = readJsonNode(userJsonNode, "familyName").asText();
+//        String givenName = readJsonNode(userJsonNode, "givenName").asText();
+        String fullName = readJsonNode(userJsonNode, "fullName").asText();
         String dob = readJsonNode(userJsonNode, "dob").asText();
         String gender = readJsonNode(userJsonNode, "gender").asText();
         String profileImage = readJsonNode(userJsonNode, "profileImage").asText();
@@ -62,8 +63,7 @@ public class CustomUserDetailsDeserializer extends JsonDeserializer<CustomUserDe
         user.setUserAuthorities(userAuthorities);
         user.setEmail(email);
         user.setPassword(password);
-        user.setFamilyName(familyName);
-        user.setGivenName(givenName);
+        user.setFullName(fullName);
         user.setProfileImage(profileImage);
         log.info("DOB: {}", dob);
         user.setDob(LocalDate.now());

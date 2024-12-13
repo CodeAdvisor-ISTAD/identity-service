@@ -28,9 +28,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
   datasource:
-    url: jdbc:postgresql://localhost:5433/oauth2
+    url: jdbc:postgresql://localhost:5432/oauth2
     username: postgres
-    password: qwer
+    password: 123456
     driver-class-name: org.postgresql.Driver
   servlet:
     multipart:
@@ -40,7 +40,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: istad.codeadvisors@gmail.com
-    password: lbvu vocp ecja jonb
+    password: urfl rzjr zbcn jsvn
     properties:
       mail:
         smtp:
@@ -56,4 +56,6 @@ logging:
   level:
     org:
       springframework:
+#        web: DEBUG
+#        mail: DEBUG
         security: DEBUG

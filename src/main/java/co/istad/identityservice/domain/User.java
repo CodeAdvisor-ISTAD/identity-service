@@ -6,8 +6,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -48,11 +50,8 @@ public class User extends Auditable<String> {
     @Column(unique = true, length = 64)
     private String appleId;
 
-    @Column(nullable = false, columnDefinition = "Text")
-    private String familyName;
-
-    @Column(nullable = false, columnDefinition = "Text")
-    private String givenName;
+    @Column(nullable = false, length = 64)
+    private String fullName;
 
     @Column(unique = true)
     private String phoneNumber;
@@ -84,6 +83,7 @@ public class User extends Auditable<String> {
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean emailVerified;
+
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Set<UserAuthority> userAuthorities;

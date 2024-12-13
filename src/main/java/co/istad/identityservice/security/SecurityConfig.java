@@ -77,7 +77,6 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
-
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
                         )
                 );
@@ -90,22 +89,43 @@ public class SecurityConfig {
     @Bean
     @Order(2)
     SecurityFilterChain configureHttpSecurity(HttpSecurity http) throws Exception {
-
+//
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        .anyRequest().permitAll()
+//                )
+//
+//                .oauth2ResourceServer(oauth2 -> oauth2
+//                        .jwt(Customizer.withDefaults())
+//                )
+//                .oauth2Login(Customizer.withDefaults())
+//                .formLogin(Customizer.withDefaults())
+////                .formLogin(form -> form
+////                        .loginPage("/oauth2/login")
+////                        .usernameParameter("gp_account")
+////                        .passwordParameter("gp_password")
+////                )
+//                .cors(AbstractHttpConfigurer::disable)
+//                .csrf(AbstractHttpConfigurer::disable);
+//
+//        return http.build();
         http
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .requestMatchers("/login", "/oauth2/**", "/error","/register","/otp").permitAll()
+                        .anyRequest().authenticated()
                 )
-
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("http://localhost:8168/", true)
+                        .failureUrl("/login?error=true")
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults())
                 )
-                .oauth2Login(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
-//                .formLogin(form -> form
-//                        .loginPage("/oauth2/login")
-//                        .usernameParameter("gp_account")
-//                        .passwordParameter("gp_password")
-//                )
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable);
 
@@ -136,8 +156,10 @@ public class SecurityConfig {
                         .subject(authentication.getName())
                         .claim("scope", scopes)
                         .claim("uuid", customUserDetails.getUser().getUuid())
-                        .claim("userFullName", String.format("%s %s", customUserDetails.getUser().getFamilyName(),
-                                customUserDetails.getUser().getGivenName()));
+                        .claim("username", customUserDetails.getUser().getUsername())
+                        .claim("fullName", customUserDetails.getUser().getFullName());
+//                        .claim("userFullName", String.format("%s %s", customUserDetails.getUser().getFamilyName(),
+//                                customUserDetails.getUser().getGivenName()));
             }
         };
     }

@@ -56,8 +56,7 @@ public class Init {
             adminUser.setUsername("admin");
             adminUser.setEmail("istad.codeadvisors@gmail.com");
             adminUser.setPassword(passwordEncoder.encode("qwerqwer"));
-            adminUser.setFamilyName("Yith");
-            adminUser.setGivenName("Sopheaktra");
+            adminUser.setFullName("HelloBroBro");
             adminUser.setProfileImage("avatar.png");
             adminUser.setCoverImage("cover.png");
             adminUser.setDob(LocalDate.now());

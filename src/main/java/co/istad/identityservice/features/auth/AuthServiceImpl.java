@@ -1,10 +1,15 @@
 package co.istad.identityservice.features.auth;
 
 
+import co.istad.identityservice.domain.Authority;
+import co.istad.identityservice.domain.EmailVerificationToken;
 import co.istad.identityservice.domain.User;
+import co.istad.identityservice.domain.UserAuthority;
 import co.istad.identityservice.features.auth.dto.ChangePasswordRequest;
 import co.istad.identityservice.features.auth.dto.RegisterRequest;
 import co.istad.identityservice.features.auth.dto.RegisterSubscriberRequest;
+import co.istad.identityservice.features.authority.AuthorityRepository;
+import co.istad.identityservice.features.emailverification.EmailVerificationTokenService;
 import co.istad.identityservice.features.user.UserMapper;
 import co.istad.identityservice.features.user.UserRepository;
 import co.istad.identityservice.features.user.UserService;
@@ -20,6 +25,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +39,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AuthorityRepository authorityRepository;
+    private final EmailVerificationTokenService emailVerificationTokenService;
 
 
     @Transactional
@@ -48,6 +60,43 @@ public class AuthServiceImpl implements AuthService {
         userService.createNewUser(userCreationRequest);
 
         return userService.findByUsername(registerRequest.username());*/
+
+        if (userRepository.existsByUsername(registerRequest.username())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is already taken");
+        }
+
+        if (userRepository.existsByEmail(registerRequest.email())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is already taken");
+        }
+
+        Random random = new Random();
+        System.out.printf("%04d%n", random.nextInt(10000));
+
+        Authority authority = authorityRepository.findByName("USER")
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Authority has not been found"));
+
+
+
+
+        User user = userMapper.registerRequestToUser(registerRequest);
+        user.setPassword(passwordEncoder.encode(registerRequest.password()));
+        user.setUuid(UUID.randomUUID().toString());
+        user.setProfileImage("users/user-icon.png");
+        user.setCoverImage("users/cover.png");
+        user.setAccountNonExpired(true);
+        user.setAccountNonLocked(true);
+        user.setCredentialsNonExpired(true);
+        user.setIsEnabled(true);
+        user.setEmailVerified(false);
+        UserAuthority userAuthority = new UserAuthority();
+        userAuthority.setUser(user);
+        userAuthority.setAuthority(authority);
+        user.setUserAuthorities(Set.of(userAuthority));
+
+        userRepository.save(user);
+
+        emailVerificationTokenService.generate(user);
+
         return null;
     }
 

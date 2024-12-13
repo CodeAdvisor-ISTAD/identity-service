@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CodeAdvisors - Login</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css"
+            rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Koh+Santepheap:wght@400;700&display=swap"
+            rel="stylesheet"
+    />
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+        }
+
+        .khmer {
+            font-family: "Koh Santepheap", sans-serif;
+        }
+
+        .bg_primary {
+            background: #000040;
+        }
+
+        .bg_primary:hover {
+            background: #000050;
+        }
+
+        .color_primary {
+            color: #000040;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+<div class="flex justify-center items-center min-h-screen m-5">
+    <div
+            class="rounded-lg px-10 pb-10 pt-1 w-full max-w-xl bg-white shadow-lg"
+    >
+        <div class="flex justify-center">
+            <img
+                    src="/resources/static/img/LogoCA.png"
+                    alt="CodeAdvisors Logo"
+                    class="w-36 rounded-full"
+            />
+        </div>
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-1 khmer">
+            បង្កើតគណនី
+        </h1>
+        <p class="text-sm text-grey-300 text-center mb-8 khmer">
+            មានគណនីរួចហើយ?
+            <a href="/login" class="underline color_primary bold">ចូលប្រើ </a>
+        </p>
+        <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="space-y-6">
+            <div>
+                <label
+                        for="fullName"
+                        class="block text-sm font-medium text-gray-700 mb-2 khmer"
+                >ឈ្មោះពេញ</label>
+                <input
+                        type="text"
+                        id="fullName"
+                        th:field="*{fullName}"
+                        placeholder="បញ្ចូលឈ្មោះរបស់អ្នក"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer"
+                        required
+                />
+                <p th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"
+                   class="text-red-500 text-sm khmer"></p>
+            </div>
+            <div>
+                <label
+                        for="username"
+                        class="block text-sm font-medium text-gray-700 mb-2 khmer"
+                >ឈ្មោះអ្នកប្រើប្រាស់</label>
+                <input
+                        type="text"
+                        id="username"
+                        th:field="*{username}"
+                        placeholder="បញ្ចូលឈ្មោះអ្នកប្រើប្រាស់"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer"
+                        required
+                />
+                <p th:if="${#fields.hasErrors('fullName')}" th:errors="*{username}"
+                   class="text-red-500 text-sm khmer"></p>
+            </div>
+            <div>
+                <label
+                        for="email"
+                        class="block text-sm font-medium text-gray-700 mb-2 khmer"
+                >អាសយដ្ឋានអ៊ីមែល</label>
+                <input
+                        type="email"
+                        id="email"
+                        th:field="*{email}"
+                        placeholder="បញ្ចូលអាសយដ្ឋានអ៊ីមែលរបស់អ្នក"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer"
+                        required
+                />
+                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-red-500 text-sm khmer"></p>
+            </div>
+            <div>
+                <label
+                        for="password1"
+                        class="block text-sm font-medium text-gray-700 mb-2 khmer"
+                >បង្កើតពាក្យសម្ងាត់</label>
+                <div class="relative">
+                    <input
+                            type="password"
+                            id="password1"
+                            th:field="*{password}"
+                            placeholder="ពាក្យសម្ងាត់របស់អ្នក"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer pr-10"
+                            required
+                    />
+                    <button
+                            type="button"
+                            id="toggle-password1"
+                            class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+                    >
+                        <svg
+                                id="eye-icon1"
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                        >
+                            <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                   class="text-red-500 text-sm khmer"></p>
+            </div>
+            <div>
+                <label
+                        for="password2"
+                        class="block text-sm font-medium text-gray-700 mb-2 khmer"
+                >បញ្ជាក់ពាក្យសម្ងាត់</label>
+                <div class="relative">
+                    <input
+                            type="password"
+                            id="password2"
+                            th:field="*{confirmedPassword}"
+                            placeholder="ពាក្យសម្ងាត់របស់អ្នក"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer pr-10"
+                            required
+                    />
+                    <button
+                            type="button"
+                            id="toggle-password2"
+                            class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+                    >
+                        <svg
+                                id="eye-icon2"
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                        >
+                            <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <p th:if="${#fields.hasErrors('confirmedPassword')}" th:errors="*{confirmedPassword}"
+                   class="text-red-500 text-sm khmer"></p>
+            </div>
+            <p class="text-sm color_primary khmer">
+                ដោយបង្កើតគណនី, អ្នកយល់ព្រមនឹងលក្ខខណ្ឌប្រើប្រាស់ និងគោលការណ៍ឯកជនភាព
+            </p>
+            <button
+                    type="submit"
+                    class="w-full bg_primary text-white py-3 rounded-lg font-medium transition khmer"
+            >
+                បង្កើតគណនី
+            </button>
+        </form>
+        <div class="flex items-center my-6">
+            <div class="flex-grow h-px bg-gray-300"></div>
+            <span class="px-4 text-sm text-gray-500 khmer">ឬ</span>
+            <div class="flex-grow h-px bg-gray-300"></div>
+        </div>
+        <div class="space-y-4">
+            <button
+                    class="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-200 transition khmer flex items-center justify-center"
+            >
+                <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png"
+                        alt="Google Logo"
+                        class="w-6 h-6 mr-2"
+                />
+                ភ្ជាប់ជាមួយ Google
+            </button>
+            <button
+                    class="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-200 transition khmer flex items-center justify-center"
+            >
+                <img
+                        src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
+                        alt="GitHub Logo"
+                        class="w-6 h-6 mr-2"
+                />
+                ភ្ជាប់ជាមួយ GitHub
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleVisibility = (toggleButtonId, inputId) => {
+            const button = document.getElementById(toggleButtonId);
+            const input = document.getElementById(inputId);
+
+            button.addEventListener("click", () => {
+                input.type = input.type === "password" ? "text" : "password";
+            });
+        };
+
+        toggleVisibility("toggle-password1", "password1");
+        toggleVisibility("toggle-password2", "password2");
+    });
+</script>
+</body>
+</html>

@@ -29,8 +29,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(registerRequest));
     }
 
-
-
     @PreAuthorize("hasAnyAuthority('SCOPE_USER', 'SCOPE_profile')")
     @GetMapping("/me")
     UserResponse findMe(Authentication authentication) {

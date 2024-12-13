@@ -19,4 +19,6 @@ public interface AuthService {
 
 	void isNotAuthenticated(Authentication authentication);
 
+
+
 }

@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsernameAndIsEnabledTrue(String username);
 
+    Optional<User> findByEmailAndIsEnabledTrueAndEmailVerifiedTrue(String email);
+
     Optional<User> findByUsernameAndIsEnabledFalse(String username);
 
     Optional<User> findByUsernameAndPasswordAndIsEnabledTrue(String username, String password);
@@ -24,7 +26,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmailAndPasswordAndIsEnabledTrue(String email, String password);
 
-    List<User> findAllByFamilyNameContainsOrGivenNameContainsOrUsernameContains(String firstName, String lastName, String username);
+//    List<User> findAllByFamilyNameContainsOrGivenNameContainsOrUsernameContains(String firstName, String lastName, String username);
 
     boolean existsByUsername(String username);
 
