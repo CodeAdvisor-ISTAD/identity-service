@@ -62,11 +62,11 @@ public class AuthServiceImpl implements AuthService {
         return userService.findByUsername(registerRequest.username());*/
 
         if (userRepository.existsByUsername(registerRequest.username())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is already taken");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
 
         if (userRepository.existsByEmail(registerRequest.email())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is already taken");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
         }
 
         Random random = new Random();

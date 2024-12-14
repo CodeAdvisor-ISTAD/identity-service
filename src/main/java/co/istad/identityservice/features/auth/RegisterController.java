@@ -35,10 +35,15 @@ public class RegisterController {
     @PostMapping("/register")
     public String handleRegistration(@Valid @ModelAttribute("registerRequest") RegisterRequest registerRequest,
                                      BindingResult result, Model model, HttpSession session) {
+        result.getAllErrors().forEach(error -> {
+            log.info("error: {}", error.getDefaultMessage());
+        });
+
         if (result.hasErrors()) {
             return "register";
         }
         log.info("Register request: {}", registerRequest);
+
 
         // Handle successful registration logic (e.g., saving the user)
         authService.register(registerRequest);
@@ -66,6 +71,7 @@ public class RegisterController {
                             BindingResult result,
                             Model model , HttpSession session) {
         String username = (String) session.getAttribute("username");
+        model.addAttribute("userName", username);
 
         log.info("result has errors: {}", result.getModel());
 
