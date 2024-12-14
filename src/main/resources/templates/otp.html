@@ -37,7 +37,7 @@
     <form method="POST" action="/otp">
         <div class="p-6 text-gray-800">
             <!-- Hidden input for username -->
-            <input type="hidden" name="username" th:value="${emailVerifyRequest.username}">
+            <input type="hidden" name="username" th:value="${userName}">
             <p class="mb-4 khmer">សួស្ដី <strong th:text="${userName}"></strong>,</p>
             <p class="mb-6 khmer">សូមបញ្ចូលលេខសម្ងាត់ OTP ដែលមានច្រើនខ្ទង់ ដើម្បីបន្តដំណើរការផ្ទៀងផ្ទាត់។</p>
             <!-- OTP input fields -->

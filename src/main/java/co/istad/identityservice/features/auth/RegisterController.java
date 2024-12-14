@@ -4,6 +4,7 @@ import co.istad.identityservice.features.auth.dto.OtpRequest;
 import co.istad.identityservice.features.auth.dto.RegisterRequest;
 import co.istad.identityservice.features.emailverification.EmailVerificationTokenService;
 import co.istad.identityservice.features.emailverification.dto.EmailVerifyRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String handleRegistration(@Valid @ModelAttribute("registerRequest") RegisterRequest registerRequest,
-                                     BindingResult result, Model model) {
+                                     BindingResult result, Model model, HttpSession session) {
         if (result.hasErrors()) {
             return "register";
         }
@@ -41,28 +42,37 @@ public class RegisterController {
 
         // Handle successful registration logic (e.g., saving the user)
         authService.register(registerRequest);
+
+        // Save the username in the session
+        session.setAttribute("username", registerRequest.username());
+
         model.addAttribute("successMessage", "Account created successfully!");
-        return "redirect:/otp?username=" + registerRequest.username();
+        return "redirect:/otp";
     }
 
     @GetMapping("/otp")
-    public String showOtpForm(@RequestParam("username") String username, Model model) {
+    public String showOtpForm(HttpSession session, Model model) {
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            return "redirect:/register";
+        }
         model.addAttribute("emailVerifyRequest", new EmailVerifyRequest(username, ""));
         model.addAttribute("userName", username);
-        model.addAttribute("resend", false);
         return "otp";
     }
 
     @PostMapping("/otp")
     public String handleOtp(@Valid @ModelAttribute("emailVerifyRequest") EmailVerifyRequest emailVerifyRequest,
                             BindingResult result,
-                            Model model) {
+                            Model model , HttpSession session) {
+        String username = (String) session.getAttribute("username");
+
         log.info("result has errors: {}", result.getModel());
 
 
         if (result.hasErrors()) {
             model.addAttribute("error", "Invalid OTP or Username. Please try again.");
-            return "redirect:/otp?username="+emailVerifyRequest.username();
+            return "otp";
         }
 
         try {
@@ -71,22 +81,22 @@ public class RegisterController {
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", "OTP verification failed. Please try again.");
-            return "redirect:/otp?username="+emailVerifyRequest.username();
+            return "otp";
         }
     }
 
     @PostMapping("/resend-otp")
-    public String resendOtp(@RequestParam("username") String username, Model model) {
+    public String resendOtp(Model model, HttpSession session) {
+        String username = (String) session.getAttribute("username");
         log.info("username resend : {}", username);
 
         try {
             emailVerificationTokenService.resend(username);
             model.addAttribute("successMessage", "OTP sent successfully!");
-            model.addAttribute("resend", true);
-            return "redirect:/otp?username=" + username;
+            return "redirect:/otp";
         } catch (Exception e) {
             model.addAttribute("error", "OTP sending failed. Please try again.");
-            return "redirect:/otp?username=" + username;
+            return "redirect:/otp";
         }
     }
 
