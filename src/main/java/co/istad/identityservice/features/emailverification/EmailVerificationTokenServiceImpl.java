@@ -58,16 +58,20 @@ public class EmailVerificationTokenServiceImpl implements EmailVerificationToken
     @Override
     public void resend(String username) {
 
+        log.info("Resend Method Run.... Resending email verification token to {}", username);
         // check if user attempts to verify exists or not
         User foundUser = userRepository.findByUsernameAndIsEnabledTrue(username)
                 .orElseThrow(() -> new ResponseStatusException  (HttpStatus.NOT_FOUND, "Unsuccessfully creation of confirmation link!"));
 
-        if (!foundUser.getEmailVerified()) {
+        log.info("User found: {}", foundUser);
+        if (foundUser.getEmailVerified()) {
+            log.info("Email is already verified");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is already verified");
         }
 
         emailVerificationTokenRepository.deleteByUser(foundUser);
         generate(foundUser);
+        log.info("Resend 100% Worked");
     }
 
     @Override

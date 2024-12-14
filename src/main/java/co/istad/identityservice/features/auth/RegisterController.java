@@ -49,7 +49,7 @@ public class RegisterController {
     public String showOtpForm(@RequestParam("username") String username, Model model) {
         model.addAttribute("emailVerifyRequest", new EmailVerifyRequest(username, ""));
         model.addAttribute("userName", username);
-        model.addAttribute("resend",false);
+        model.addAttribute("resend", false);
         return "otp";
     }
 
@@ -62,7 +62,7 @@ public class RegisterController {
 
         if (result.hasErrors()) {
             model.addAttribute("error", "Invalid OTP or Username. Please try again.");
-            return "otp";
+            return "redirect:/otp?username="+emailVerifyRequest.username();
         }
 
         try {
@@ -71,11 +71,24 @@ public class RegisterController {
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", "OTP verification failed. Please try again.");
-            return "otp";
+            return "redirect:/otp?username="+emailVerifyRequest.username();
         }
     }
 
+    @PostMapping("/resend-otp")
+    public String resendOtp(@RequestParam("username") String username, Model model) {
+        log.info("username resend : {}", username);
 
+        try {
+            emailVerificationTokenService.resend(username);
+            model.addAttribute("successMessage", "OTP sent successfully!");
+            model.addAttribute("resend", true);
+            return "redirect:/otp?username=" + username;
+        } catch (Exception e) {
+            model.addAttribute("error", "OTP sending failed. Please try again.");
+            return "redirect:/otp?username=" + username;
+        }
+    }
 
 
 }

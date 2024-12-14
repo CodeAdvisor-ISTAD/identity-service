@@ -67,20 +67,39 @@
 
             <p th:if="${error}" class="text-red-500 text-sm khmer p-4" th:text="${error}"></p>
 
-
-            <div class="flex justify-between ">
-                <button type="submit" class="bg_primary text-white py-2 px-4 md:px-6 rounded khmer">ផ្ទៀងផ្ទាត់</button>
-
-                <form method="POST" action="/otp/resend">
-                    <input type="hidden" name="username" th:value="${emailVerifyRequest.username}">
-                    <button type="submit" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded khmer">
-                        បញ្ចូន OTP ម្តងទៀត
-                    </button>
-                </form>
-
-            </div>
+            <button type="submit" class="bg_primary text-white py-2 px-4 md:px-6 rounded khmer">ផ្ទៀងផ្ទាត់</button>
         </div>
+
     </form>
+    <!--    <div class="">-->
+    <!--        <form method="POST" action="/resend-otp">-->
+    <!--            <input type="hidden" name="username" th:value="${userName}">-->
+    <!--            <button type="submit" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded khmer">-->
+    <!--                បញ្ចូន OTP ម្តងទៀត-->
+    <!--            </button>-->
+    <!--        </form>-->
+    <!--        &lt;!&ndash;                <a th:href="@{/resend-otp(username=${emailVerifyRequest.username})}"&ndash;&gt;-->
+    <!--        &lt;!&ndash;                   class="hover:underline khmer color_primary">បញ្ចូន OTP ម្តងទៀត</a>&ndash;&gt;-->
+
+    <!--    </div>-->
+    <div class="flex justify-between items-center px-6 mb-9 ">
+        <!-- Verify Button -->
+        <!--        <form method="POST" action="/otp">-->
+        <!--            <input type="hidden" name="username" th:value="${userName}">-->
+        <!--            <button type="submit" class="bg_primary text-white py-2 px-4 md:px-6 rounded khmer">-->
+        <!--                ផ្ទៀងផ្ទាត់-->
+        <!--            </button>-->
+        <!--        </form>-->
+
+        <!-- Resend Button -->
+        <form method="POST" action="/resend-otp" id="resendForm">
+            <input type="hidden" name="username" th:value="${userName}">
+            <button type="submit" id="resendBtn"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded khmer">
+                បញ្ចូន OTP ម្តងទៀត
+            </button>
+        </form>
+    </div>
 
     <div class="bg-gray-100 text-center py-3 text-sm text-gray-600 rounded-b-lg">
         <p>&copy; 2024 CodeAdvisors | <a href="#" class="text-primary hover:underline khmer">ទំនាក់ទំនង</a></p>
@@ -90,10 +109,38 @@
     document.addEventListener("DOMContentLoaded", () => {
         const inputs = document.querySelectorAll(".otp-input");
         const tokenInput = document.getElementById("token");
+        const resendBtn = document.getElementById("resendBtn");
+        const resendForm = document.getElementById("resendForm");
 
-        document.querySelector("form").addEventListener("submit", (e) => {
-            // Combine OTP inputs into the hidden token field
-            let token = Array.from(inputs).map(input => input.value).join("");
+        // Automatically start the Resend button cooldown when the page loads
+        let cooldownEndTime = Date.now() + 30000; // 30 seconds from page load
+        const startCooldown = (remainingTime) => {
+            resendBtn.disabled = true;
+            resendBtn.classList.add("opacity-50", "cursor-not-allowed");
+            resendBtn.classList.remove("hover:bg-gray-400");
+
+            let timeLeft = Math.floor(remainingTime / 1000);
+
+            const interval = setInterval(() => {
+                if (timeLeft > 0) {
+                    resendBtn.textContent = `សូមរង់ចាំ ${timeLeft} វិនាទី...`;
+                    timeLeft--;
+                } else {
+                    clearInterval(interval);
+                    resendBtn.disabled = false;
+                    resendBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                    resendBtn.classList.add("hover:bg-gray-400");
+                    resendBtn.textContent = "បញ្ចូន OTP ម្តងទៀត";
+                }
+            }, 1000);
+        };
+
+        // Start the cooldown when the page loads
+        startCooldown(cooldownEndTime - Date.now());
+
+        // Logic to combine OTP inputs into a hidden token field
+        document.querySelector("form").addEventListener("submit", () => {
+            const token = Array.from(inputs).map(input => input.value).join("");
             tokenInput.value = token;
         });
 
@@ -133,7 +180,19 @@
             input.addEventListener("keydown", handleKeyDown);
             input.addEventListener("paste", handlePaste);
         });
+
+        // Handle Resend OTP button cooldown after submission
+        resendForm.addEventListener("submit", (e) => {
+            resendBtn.disabled = true;
+            resendBtn.classList.add("opacity-50", "cursor-not-allowed");
+            resendBtn.classList.remove("hover:bg-gray-400");
+            resendBtn.textContent = "សូមរង់ចាំ 30 វិនាទី...";
+
+            cooldownEndTime = Date.now() + 30000; // Set new cooldown time
+            startCooldown(30000); // Restart cooldown
+        });
     });
+
 </script>
 
 </body>
