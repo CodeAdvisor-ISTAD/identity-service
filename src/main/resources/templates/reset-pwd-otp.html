@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ផ្ទៀងផ្ទាត់ OTP</title>
+    <title>ផ្ទៀងផ្ទាត់ OTP - Reset Password</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Koh+Santepheap:wght@400;700&display=swap">
@@ -34,14 +34,14 @@
     <div class="bg_primary text-white py-4 text-center rounded-t-lg">
         <h1 class="text-xl md:text-2xl font-bold khmer">ផ្ទៀងផ្ទាត់លេខសម្ងាត់ OTP</h1>
     </div>
-    <form method="POST" action="/otp">
+    <form method="POST" action="/reset-pwd-otp">
         <div class="px-6 pt-6 text-gray-800">
             <!-- Hidden input for username -->
             <input type="hidden" name="username" th:value="${userName}">
             <p class="mb-4 khmer">សួស្ដី <strong th:text="${userName}"></strong>,</p>
             <p class="mb-6 khmer">សូមបញ្ចូលលេខសម្ងាត់ OTP ដែលមានច្រើនខ្ទង់ ដើម្បីបន្តដំណើរការផ្ទៀងផ្ទាត់។</p>
             <!-- OTP input fields -->
-            <div class="flex justify-center gap-1 md:gap-2 mb-10 ">
+            <div class="flex justify-center gap-1 md:gap-2 mb-10">
                 <input type="text"
                        class="otp-input w-10 h-10 md:w-12 md:h-12 text-center text-xl md:text-2xl border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
                        maxlength="1" name="otp1">
@@ -78,25 +78,9 @@
         </div>
 
     </form>
-    <!--    <div class="">-->
-    <!--        <form method="POST" action="/resend-otp">-->
-    <!--            <input type="hidden" name="username" th:value="${userName}">-->
-    <!--            <button type="submit" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded khmer">-->
-    <!--                បញ្ចូន OTP ម្តងទៀត-->
-    <!--            </button>-->
-    <!--        </form>-->
-    <!--        &lt;!&ndash;                <a th:href="@{/resend-otp(username=${emailVerifyRequest.username})}"&ndash;&gt;-->
-    <!--        &lt;!&ndash;                   class="hover:underline khmer color_primary">បញ្ចូន OTP ម្តងទៀត</a>&ndash;&gt;-->
 
-    <!--    </div>-->
     <div class="flex justify-between items-center px-6 mb-9 ">
-        <!-- Verify Button -->
-        <!--        <form method="POST" action="/otp">-->
-        <!--            <input type="hidden" name="username" th:value="${userName}">-->
-        <!--            <button type="submit" class="bg_primary text-white py-2 px-4 md:px-6 rounded khmer">-->
-        <!--                ផ្ទៀងផ្ទាត់-->
-        <!--            </button>-->
-        <!--        </form>-->
+
 
         <!-- Resend Button -->
         <form method="POST" action="/resend-otp" id="resendForm">
@@ -116,31 +100,6 @@
         const resendBtn = document.getElementById("resendBtn");
         const resendForm = document.getElementById("resendForm");
 
-        // // Automatically start the Resend button cooldown when the page loads
-        // let cooldownEndTime = Date.now() + 30000; // 30 seconds from page load
-        // const startCooldown = (remainingTime) => {
-        //     resendBtn.disabled = true;
-        //     resendBtn.classList.add("opacity-50", "cursor-not-allowed");
-        //     resendBtn.classList.remove("hover:bg-gray-400");
-        //
-        //     let timeLeft = Math.floor(remainingTime / 1000);
-        //
-        //     const interval = setInterval(() => {
-        //         if (timeLeft > 0) {
-        //             resendBtn.textContent = `សូមរង់ចាំ ${timeLeft} វិនាទី...`;
-        //             timeLeft--;
-        //         } else {
-        //             clearInterval(interval);
-        //             resendBtn.disabled = false;
-        //             resendBtn.classList.remove("opacity-50", "cursor-not-allowed");
-        //             resendBtn.classList.add("hover:bg-gray-400");
-        //             resendBtn.textContent = "បញ្ចូន OTP ម្តងទៀត";
-        //         }
-        //     }, 1000);
-        // };
-        //
-        // // Start the cooldown when the page loads
-        // // startCooldown(cooldownEndTime - Date.now());
         resendBtn.addEventListener("click", (event) => {
             event.preventDefault(); // Prevent immediate form submission
 

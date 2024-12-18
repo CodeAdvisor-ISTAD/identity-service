@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>CodeAdvisors - Login</title>
+    <title>បង្កើតគណនី</title>
     <link
             href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css"
             rel="stylesheet"
@@ -43,7 +43,7 @@
     >
         <div class="flex justify-center">
             <img
-                    src="/resources/static/img/LogoCA.png"
+                    src="http://136.228.158.126:4011/images/5c1d4daf-45f2-4ae5-861b-2ac5a36e43f1.png"
                     alt="CodeAdvisors Logo"
                     class="w-36 rounded-full"
             />
@@ -85,7 +85,7 @@
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer"
                         required
                 />
-                <p th:if="${#fields.hasErrors('fullName')}" th:errors="*{username}"
+                <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
                    class="text-red-500 text-sm khmer"></p>
             </div>
             <div>
@@ -122,20 +122,24 @@
                             id="toggle-password1"
                             class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
                     >
-                        <svg
-                                id="eye-icon1"
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                        >
-                            <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                            />
+                        <svg id="eye-icon1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5">
+                            <path d="M14.83 9.17999C14.2706 8.61995 13.5576 8.23846 12.7813 8.08386C12.0049 7.92926 11.2002 8.00851 10.4689 8.31152C9.73758 8.61453 9.11264 9.12769 8.67316 9.78607C8.23367 10.4444 7.99938 11.2184 8 12.01C7.99916 13.0663 8.41619 14.08 9.16004 14.83"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M12 16.01C13.0609 16.01 14.0783 15.5886 14.8284 14.8384C15.5786 14.0883 16 13.0709 16 12.01"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M17.61 6.39004L6.38 17.62C4.6208 15.9966 3.14099 14.0944 2 11.99C6.71 3.76002 12.44 1.89004 17.61 6.39004Z"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M20.9994 3L17.6094 6.39" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M6.38 17.62L3 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M19.5695 8.42999C20.4801 9.55186 21.2931 10.7496 21.9995 12.01C17.9995 19.01 13.2695 21.4 8.76953 19.23"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
                         </svg>
                     </button>
                 </div>
@@ -161,20 +165,24 @@
                             id="toggle-password2"
                             class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
                     >
-                        <svg
-                                id="eye-icon2"
-                                xmlns="http://www.w3.org/2000/svg"
-                                class="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                        >
-                            <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                            />
+                        <svg id="eye-icon2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                             class="h-5 w-5">
+                            <path d="M14.83 9.17999C14.2706 8.61995 13.5576 8.23846 12.7813 8.08386C12.0049 7.92926 11.2002 8.00851 10.4689 8.31152C9.73758 8.61453 9.11264 9.12769 8.67316 9.78607C8.23367 10.4444 7.99938 11.2184 8 12.01C7.99916 13.0663 8.41619 14.08 9.16004 14.83"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M12 16.01C13.0609 16.01 14.0783 15.5886 14.8284 14.8384C15.5786 14.0883 16 13.0709 16 12.01"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M17.61 6.39004L6.38 17.62C4.6208 15.9966 3.14099 14.0944 2 11.99C6.71 3.76002 12.44 1.89004 17.61 6.39004Z"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M20.9994 3L17.6094 6.39" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M6.38 17.62L3 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
+                            <path d="M19.5695 8.42999C20.4801 9.55186 21.2931 10.7496 21.9995 12.01C17.9995 19.01 13.2695 21.4 8.76953 19.23"
+                                  stroke="#000000" stroke-width="1.5" stroke-linecap="round"
+                                  stroke-linejoin="round"></path>
                         </svg>
                     </button>
                 </div>
@@ -222,17 +230,42 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const toggleVisibility = (toggleButtonId, inputId) => {
+        const toggleVisibility = (toggleButtonId, inputId, eyeIconId) => {
             const button = document.getElementById(toggleButtonId);
             const input = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(eyeIconId);
+
+            // SVG for closed eye (hidden password)
+            const eyeClosedSVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
+            <path d="M14.83 9.17999C14.2706 8.61995 13.5576 8.23846 12.7813 8.08386C12.0049 7.92926 11.2002 8.00851 10.4689 8.31152C9.73758 8.61453 9.11264 9.12769 8.67316 9.78607C8.23367 10.4444 7.99938 11.2184 8 12.01C7.99916 13.0663 8.41619 14.08 9.16004 14.83" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12 16.01C13.0609 16.01 14.0783 15.5886 14.8284 14.8384C15.5786 14.0883 16 13.0709 16 12.01" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M17.61 6.39004L6.38 17.62C4.6208 15.9966 3.14099 14.0944 2 11.99C6.71 3.76002 12.44 1.89004 17.61 6.39004Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M20.9994 3L17.6094 6.39" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M6.38 17.62L3 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M19.5695 8.42999C20.4801 9.55186 21.2931 10.7496 21.9995 12.01C17.9995 19.01 13.2695 21.4 8.76953 19.23" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>`;
+
+            // SVG for open eye (visible password)
+            const eyeOpenSVG = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
+            <path d="M12 16.01C14.2091 16.01 16 14.2191 16 12.01C16 9.80087 14.2091 8.01001 12 8.01001C9.79086 8.01001 8 9.80087 8 12.01C8 14.2191 9.79086 16.01 12 16.01Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2 11.98C8.09 1.31996 15.91 1.32996 22 11.98" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M22 12.01C15.91 22.67 8.09 22.66 2 12.01" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>`;
 
             button.addEventListener("click", () => {
-                input.type = input.type === "password" ? "text" : "password";
+                if (input.type === "password") {
+                    input.type = "text";
+                    eyeIcon.innerHTML = eyeOpenSVG;
+                } else {
+                    input.type = "password";
+                    eyeIcon.innerHTML = eyeClosedSVG;
+                }
             });
         };
 
-        toggleVisibility("toggle-password1", "password1");
-        toggleVisibility("toggle-password2", "password2");
+        // Apply to both password fields
+        toggleVisibility("toggle-password1", "password1", "eye-icon1");
+        toggleVisibility("toggle-password2", "password2", "eye-icon2");
     });
 </script>
 </body>

@@ -54,7 +54,7 @@ public class Init {
             User adminUser = new User();
             adminUser.setUuid(UUID.randomUUID().toString());
             adminUser.setUsername("admin");
-            adminUser.setEmail("istad.codeadvisors@gmail.com");
+            adminUser.setEmail("mengseu2004@gmail.com");
             adminUser.setPassword(passwordEncoder.encode("qwerqwer"));
             adminUser.setFullName("HelloBroBro");
             adminUser.setProfileImage("avatar.png");

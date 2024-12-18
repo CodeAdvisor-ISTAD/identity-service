@@ -8,6 +8,7 @@ import co.istad.identityservice.domain.UserAuthority;
 import co.istad.identityservice.features.auth.dto.ChangePasswordRequest;
 import co.istad.identityservice.features.auth.dto.RegisterRequest;
 import co.istad.identityservice.features.auth.dto.RegisterSubscriberRequest;
+import co.istad.identityservice.features.auth.dto.ResetPasswordRequest;
 import co.istad.identityservice.features.authority.AuthorityRepository;
 import co.istad.identityservice.features.emailverification.EmailVerificationTokenService;
 import co.istad.identityservice.features.user.UserMapper;
@@ -43,30 +44,44 @@ public class AuthServiceImpl implements AuthService {
     private final EmailVerificationTokenService emailVerificationTokenService;
 
 
+    @Override
+    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        User user = userRepository.findByUsername(resetPasswordRequest.username())
+                .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "User has not been found"));
+
+        if (!resetPasswordRequest.password().equals(resetPasswordRequest.confirmPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
+        }
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequest.password()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public String forgetPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElse(null);
+        if (user == null) {
+            return "Email is not in the system";
+        }
+        emailVerificationTokenService.generate(user);
+        return user.getUsername();
+    }
+
     @Transactional
     @Override
-    public UserResponse register(RegisterRequest registerRequest) {
-
-        /*// map register request to user entity (DTO pattern)
-        UserCreationRequest userCreationRequest = userMapper.mapRegisterRequestToUserCreationRequest(registerRequest);
-
-        // check if password and confirmation password match (validation)
-        userService.checkForPasswords(registerRequest.password(), registerRequest.confirmedPassword());
-
-        // check if accept terms or not (validation)
-        userService.checkTermsAndConditions(registerRequest.acceptTerms());
-
-        // if everything is OK, user will be created
-        userService.createNewUser(userCreationRequest);
-
-        return userService.findByUsername(registerRequest.username());*/
+    public String register(RegisterRequest registerRequest) {
 
         if (userRepository.existsByUsername(registerRequest.username())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
+            return "Username is already taken";
         }
 
         if (userRepository.existsByEmail(registerRequest.email())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
+            return "Email is already taken";
         }
 
         Random random = new Random();
@@ -97,7 +112,7 @@ public class AuthServiceImpl implements AuthService {
 
         emailVerificationTokenService.generate(user);
 
-        return null;
+        return "Account created successfully!";
     }
 
     @Override
