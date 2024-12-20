@@ -74,7 +74,8 @@ public class CustomUserDetailsDeserializer extends JsonDeserializer<CustomUserDe
         user.setCredentialsNonExpired(credentialsNonExpired);
         user.setAccountNonLocked(accountNonLocked);
         user.setAccountNonExpired(accountNoExpired);
-        user.setIpAddress(ipAddress);
+//        user.setIpAddress(ipAddress);
+
 
         CustomUserDetails customUserDetails = new CustomUserDetails();
         customUserDetails.setUser(user);

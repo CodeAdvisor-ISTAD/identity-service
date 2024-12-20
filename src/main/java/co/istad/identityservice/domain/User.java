@@ -66,9 +66,6 @@ public class User extends Auditable<String> {
     @Column(length = 256)
     private String coverImage;
 
-    @Column(length = 256)
-    private String ipAddress;
-
     @Column(columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean accountNonExpired;
 

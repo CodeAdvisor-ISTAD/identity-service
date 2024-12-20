@@ -38,13 +38,22 @@
         .pointer {
             cursor: pointer;
         }
+
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
 <div class="flex justify-center items-center min-h-screen m-5">
-    <div
-            class="rounded-lg px-10 pb-10 pt-3 w-full max-w-xl bg-white shadow-lg"
-    >
+    <div class="rounded-lg px-10 pb-10 pt-3 w-full max-w-xl bg-white shadow-lg">
         <div class="flex justify-center mb-1">
             <img
                     src="http://136.228.158.126:4011/images/5c1d4daf-45f2-4ae5-861b-2ac5a36e43f1.png"
@@ -57,7 +66,7 @@
         </h1>
 
         <!-- Login Form with Spring Security -->
-        <form th:action="@{/login}" method="post" class="space-y-6">
+        <form id="loginForm" th:action="@{/login}" method="post" class="space-y-6">
             <!-- Error Message -->
             <div th:if="${param.error}"
                  class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -102,7 +111,6 @@
                             id="toggle-password"
                             class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
                     >
-                        <!-- Default eye-closed SVG -->
                         <svg id="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
                             <path d="M14.83 9.17999C14.2706 8.61995 13.5576 8.23846 12.7813 8.08386C12.0049 7.92926 11.2002 8.00851 10.4689 8.31152C9.73758 8.61453 9.11264 9.12769 8.67316 9.78607C8.23367 10.4444 7.99938 11.2184 8 12.01C7.99916 13.0663 8.41619 14.08 9.16004 14.83" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M12 16.01C13.0609 16.01 14.0783 15.5886 14.8284 14.8384C15.5786 14.0883 16 13.0709 16 12.01" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -112,14 +120,15 @@
                             <path d="M19.5695 8.42999C20.4801 9.55186 21.2931 10.7496 21.9995 12.01C17.9995 19.01 13.2695 21.4 8.76953 19.23" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
-
                 </div>
             </div>
             <button
+                    id="submit-button"
                     type="submit"
-                    class="w-full bg_primary text-white py-3 rounded-lg font-medium transition khmer"
+                    class="w-full bg_primary text-white py-3 rounded-lg font-medium transition khmer flex items-center justify-center"
             >
-                ចូលប្រើ
+                <span id="button-text">ចូលប្រើ</span>
+                <div id="loading-spinner" class="hidden ml-2 w-5 h-5 border-4 border-white rounded-full spinner"></div>
             </button>
         </form>
 
@@ -181,20 +190,29 @@
         const passwordInput = document.getElementById('password');
         const togglePasswordButton = document.getElementById('toggle-password');
         const eyeIcon = document.getElementById('eye-icon');
+        const loginForm = document.getElementById('loginForm');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
 
+        // Password visibility toggle
         togglePasswordButton.addEventListener('click', function () {
             const isPasswordVisible = passwordInput.type === 'text';
-
-            // Toggle password visibility
             passwordInput.type = isPasswordVisible ? 'password' : 'text';
-
-            // Update the icon
             eyeIcon.innerHTML = isPasswordVisible
                 ? `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14.83 9.17999C14.2706 8.61995 13.5576 8.23846 12.7813 8.08386C12.0049 7.92926 11.2002 8.00851 10.4689 8.31152C9.73758 8.61453 9.11264 9.12769 8.67316 9.78607C8.23367 10.4444 7.99938 11.2184 8 12.01C7.99916 13.0663 8.41619 14.08 9.16004 14.83" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 16.01C13.0609 16.01 14.0783 15.5886 14.8284 14.8384C15.5786 14.0883 16 13.0709 16 12.01" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M17.61 6.39004L6.38 17.62C4.6208 15.9966 3.14099 14.0944 2 11.99C6.71 3.76002 12.44 1.89004 17.61 6.39004Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M20.9994 3L17.6094 6.39" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6.38 17.62L3 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M19.5695 8.42999C20.4801 9.55186 21.2931 10.7496 21.9995 12.01C17.9995 19.01 13.2695 21.4 8.76953 19.23" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
-
                 : `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.0007 12C15.0007 13.6569 13.6576 15 12.0007 15C10.3439 15 9.00073 13.6569 9.00073 12C9.00073 10.3431 10.3439 9 12.0007 9C13.6576 9 15.0007 10.3431 15.0007 12Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12.0012 5C7.52354 5 3.73326 7.94288 2.45898 12C3.73324 16.0571 7.52354 19 12.0012 19C16.4788 19 20.2691 16.0571 21.5434 12C20.2691 7.94291 16.4788 5 12.0012 5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`;
+        });
+
+        // Form submission loading state
+        loginForm.addEventListener('submit', function () {
+            submitButton.disabled = true;
+            buttonText.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
         });
     });
 </script>
+</body>
+</html>
 
 
