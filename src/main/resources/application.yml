@@ -59,3 +59,11 @@ logging:
 #        web: DEBUG
 #        mail: DEBUG
         security: DEBUG
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://167.172.78.79:8761/eureka/
