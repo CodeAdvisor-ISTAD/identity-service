@@ -48,7 +48,7 @@ The Identity Service includes the following HTML templates located in the `src/m
 - **Spring Security**: For managing OAuth2 and resource server functionality.
 - **JPA with PostgreSQL**: For storing user credentials and data.
 - **Spring Mail**: For sending OTP and other email notifications.
-- **Thymeleaf**: 
+- **Thymeleaf**: For rendering HTML templates.
 - **Oauth2**: For secure authorization and authentication.
 
 ---
