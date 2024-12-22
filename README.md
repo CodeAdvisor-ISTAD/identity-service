@@ -2,6 +2,8 @@
 
 ![CodeAdvisors Logo](http://167.172.78.79:8090/api/v1/files/preview?fileName=b5d01918-2824-48d7-83e0-fb557ce6bd73_2024-12-21T18-28-24.856529397.jpg)
 
+## Handle By ***Thoeng Mengseu*** And ***Yith Sopheaktra***
+
 ## Overview 🌐
 The **Identity Service** is a core component of the **CodeAdvisors** platform that handles user authentication, authorization, and identity management. It supports features like user registration, password recovery, and secure login with OAuth2.
 
