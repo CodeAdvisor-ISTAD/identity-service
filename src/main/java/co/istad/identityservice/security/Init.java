@@ -99,7 +99,7 @@ public class Init {
                 .build();
 
         var web = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("CodeAdvisor")
+                .clientId("code-advisor")
                 .clientSecret(passwordEncoder.encode("qwerqwer")) // store in secret manager
                 .scopes(scopes -> {
                     scopes.add(OidcScopes.OPENID);
@@ -107,8 +107,8 @@ public class Init {
                     scopes.add(OidcScopes.EMAIL);
                 })
                 .redirectUris(uris -> {
-                    uris.add("http://127.0.0.1:9090/login/oauth2/code/CodeAdvisor");
-                    uris.add("http://127.0.0.1:8168/login/oauth2/code/CodeAdvisor");
+                    uris.add("http://127.0.0.1:9090/login/oauth2/code/code-advisor");
+                    uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
                     uris.add("http://localhost:9090/login/oauth2/code/google");
                     uris.add("http://localhost:8168/login/oauth2/code/google");
 
@@ -127,7 +127,7 @@ public class Init {
                 .tokenSettings(tokenSettings)
                 .build();
 
-        RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("CodeAdvisor");
+        RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("codeadvisor");
 
         if (registeredClient == null) {
             jpaRegisteredClientRepository.save(web);

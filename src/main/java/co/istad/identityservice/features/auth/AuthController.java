@@ -29,13 +29,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(registerRequest));
     }
 
-    @PreAuthorize("hasAnyAuthority('SCOPE_USER', 'SCOPE_profile')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     UserResponse findMe(Authentication authentication) {
         return authService.findMe(authentication);
     }
 
-    @PreAuthorize("hasAnyAuthority('SCOPE_USER', 'SCOPE_profile')")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/me")
     UserResponse updateMeBasicInfo(Authentication authentication,
                                    @Valid @RequestBody UserBasicInfoRequest userBasicInfoRequest) {

@@ -117,7 +117,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("http://localhost:8168/", true)
+//                        .defaultSuccessUrl("http://localhost:8168/", true)
                         .failureUrl("/login?error=true")
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -141,9 +141,13 @@ public class SecurityConfig {
             Authentication authentication = context.getPrincipal();
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-//            if (context.getTokenType().getValue().equals("id_token")) {
-//                context.getClaims().claim("reksmey1", "Mom Reksmey");
-//            }
+            if (context.getTokenType().getValue().equals("id_token")) {
+                context.getClaims().claim("userUuid", customUserDetails.getUser().getUuid());
+                context.getClaims().claim("username", customUserDetails.getUser().getUsername());
+                context.getClaims().claim("fullName", customUserDetails.getUser().getFullName());
+                context.getClaims().claim("email", customUserDetails.getUser().getEmail());
+
+            }
 
             if (context.getTokenType().getValue().equals("access_token")) {
                 Set<String> scopes = new HashSet<>(context.getAuthorizedScopes());

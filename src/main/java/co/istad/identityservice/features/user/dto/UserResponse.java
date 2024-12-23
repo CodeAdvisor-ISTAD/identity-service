@@ -9,8 +9,7 @@ public record UserResponse(
     String uuid,
     String email,
     String profileImage,
-    String familyName,
-    String givenName
+    String fullName
 
 ) {
     
