@@ -95,7 +95,7 @@ public class Init {
 
         ClientSettings clientSettings = ClientSettings.builder()
                 .requireProofKey(true)
-                .requireAuthorizationConsent(true)
+                .requireAuthorizationConsent(false)
                 .build();
 
         var web = RegisteredClient.withId(UUID.randomUUID().toString())
