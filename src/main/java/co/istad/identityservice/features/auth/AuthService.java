@@ -19,6 +19,8 @@ public interface AuthService {
 
 	Optional<UserResponse> findByEmail(String email);
 
+	Optional<UserResponse> findByUsername(String username);
+
 	UserResponse updateMeBasicInfo(Authentication authentication, UserBasicInfoRequest userBasicInfoRequest);
 
 	void changePassword(Authentication authentication, ChangePasswordRequest changePasswordRequest);

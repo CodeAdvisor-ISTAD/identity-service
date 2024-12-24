@@ -142,15 +142,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private UserResponse handleGitHubUser(OAuth2User oauth2User) {
-        String email = oauth2User.getAttribute("email");
 
-        return this.findByEmail(email)
+        return this.findByUsername(oauth2User.getAttribute("login"))
                 .orElseGet(() -> userService.createGithubUser(oauth2User));
     }
 
     @Override
     public Optional<UserResponse> findByEmail(String email) {
         return userRepository.findByEmailAndIsEnabledTrue(email)
+                .map(userMapper::toUserResponse);
+    }
+
+    @Override
+    public Optional<UserResponse> findByUsername(String username) {
+        return userRepository.findByUsernameAndIsEnabledTrue(username)
                 .map(userMapper::toUserResponse);
     }
 

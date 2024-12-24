@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse createGithubUser(OAuth2User oAuth2User) {
         User user = User.builder()
                 .uuid(UUID.randomUUID().toString())
-                .username(generateUsername(oAuth2User.getAttribute("login")))
+                .username(oAuth2User.getAttribute("login"))
                 .email("github_" + oAuth2User.getAttribute("id") + "@example.com")
                 .fullName(oAuth2User.getAttribute("name"))
                 .profileImage(oAuth2User.getAttribute("avatar_url")) // Use Google profile picture
