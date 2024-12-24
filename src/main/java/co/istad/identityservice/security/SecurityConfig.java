@@ -16,7 +16,13 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -25,9 +31,9 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 @EnableWebSecurity
@@ -40,6 +46,11 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
+
+    @Bean
+    WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
 
     @Bean
     DaoAuthenticationProvider daoAuthenticationProvider() {
@@ -112,7 +123,7 @@ public class SecurityConfig {
 //        return http.build();
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/oauth2/**", "/error","/register","/otp/**","/resend-otp","/forget-password","/reset-pwd-otp", "/reset-password", "google").permitAll()
+                        .requestMatchers("/login", "/oauth2/**", "/error","/register","/otp/**","/resend-otp","/forget-password","/reset-pwd-otp", "/reset-password", "/google","http://localhost:8168","/github").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -138,68 +149,113 @@ public class SecurityConfig {
     OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
         return context -> {
             Authentication authentication = context.getPrincipal();
+            Object principal = authentication.getPrincipal();
 
-            // Handle both OAuth2 and Custom Authentication
             if (context.getTokenType().getValue().equals("id_token")) {
-                if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
-                    // Handle custom user authentication
-                    context.getClaims().claim("userUuid", customUserDetails.getUser().getUuid());
-                    context.getClaims().claim("username", customUserDetails.getUser().getUsername());
-                    context.getClaims().claim("fullName", customUserDetails.getUser().getFullName());
-                    context.getClaims().claim("email", customUserDetails.getUser().getEmail());
-                } else if (authentication.getPrincipal() instanceof DefaultOidcUser oidcUser) {
-                    // Handle Google OAuth2 authentication
-                    context.getClaims().claim("email", oidcUser.getEmail());
-                    context.getClaims().claim("fullName", oidcUser.getFullName());
-                    context.getClaims().claim("picture", oidcUser.getPicture());
-                    // Add any other claims you want to include from the OAuth2 user
+                if (principal instanceof CustomUserDetails customUserDetails) {
+                    addCustomUserClaims(context, customUserDetails);
+                } else if (principal instanceof DefaultOidcUser oidcUser) {
+                    addGoogleUserClaims(context, oidcUser);
+                } else if (principal instanceof DefaultOAuth2User oauth2User) {
+                    addGithubUserClaims(context, oauth2User);
                 }
             }
 
             if (context.getTokenType().getValue().equals("access_token")) {
-                Set<String> scopes = new HashSet<>(context.getAuthorizedScopes());
-                authentication.getAuthorities()
-                        .forEach(grantedAuthority -> scopes.add(grantedAuthority.getAuthority()));
+                addStandardClaims(context, authentication);
 
-                context.getClaims()
-                        .issuer("https://identity.istad.co")
-                        .id(authentication.getName())
-                        .subject(authentication.getName())
-                        .claim("scope", scopes);
-
-                // Add user-specific claims based on authentication type
-                if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
-                    context.getClaims()
-                            .claim("uuid", customUserDetails.getUser().getUuid())
-                            .claim("username", customUserDetails.getUser().getUsername())
-                            .claim("fullName", customUserDetails.getUser().getFullName());
-                } else if (authentication.getPrincipal() instanceof DefaultOidcUser oidcUser) {
-                    context.getClaims()
-                            .claim("email", oidcUser.getEmail())
-                            .claim("fullName", oidcUser.getFullName());
+                if (principal instanceof CustomUserDetails customUserDetails) {
+                    addCustomUserClaims(context, customUserDetails);
+                } else if (principal instanceof DefaultOidcUser oidcUser) {
+                    addGoogleUserClaims(context, oidcUser);
+                } else if (principal instanceof DefaultOAuth2User oauth2User) {
+                    addGithubUserClaims(context, oauth2User);
                 }
             }
         };
     }
 
+    private void addStandardClaims(JwtEncodingContext context, Authentication authentication) {
+        Set<String> scopes = new HashSet<>(context.getAuthorizedScopes());
+        authentication.getAuthorities()
+                .forEach(auth -> scopes.add(auth.getAuthority()));
 
-    /*@Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        context.getClaims()
+                .issuer("https://identity.istad.co")
+                .id(authentication.getName())
+                .subject(authentication.getName())
+                .claim("scope", scopes);
+    }
 
-        Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = jwt -> {
-            Collection<String> scopes = jwt.getClaimAsStringList("scope");
+    private void addCustomUserClaims(JwtEncodingContext context, CustomUserDetails user) {
+        context.getClaims()
+                .claim("userUuid", user.getUser().getUuid())
+                .claim("username", user.getUser().getUsername())
+                .claim("fullName", user.getUser().getFullName())
+                .claim("email", user.getUser().getEmail());
+    }
 
-            scopes.forEach(s -> log.info("Scope: {}", s));
+    private void addGoogleUserClaims(JwtEncodingContext context, DefaultOidcUser user) {
+        context.getClaims()
+                .claim("email", user.getEmail())
+                .claim("fullName", user.getFullName())
+                .claim("picture", user.getPicture());
+    }
 
-            return scopes.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-        };
+    private void addGithubUserClaims(JwtEncodingContext context, DefaultOAuth2User user) {
+        Map<String, Object> claims = new HashMap<>();
 
-        var jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        String email = user.getAttribute("email");
 
-        return jwtAuthenticationConverter;
-    }*/
+        if (email != null) {
+            claims.put("email", email);
+        } else {
+            claims.put("email", "random@example.com");
+        }
+        if (user.getAttribute("name") != null) {
+            claims.put("fullName", user.getAttribute("name"));
+        }
+        if (user.getAttribute("avatar_url") != null) {
+            claims.put("picture", user.getAttribute("avatar_url"));
+        }
+
+        claims.forEach((key, value) -> context.getClaims().claim(key, value));
+    }
+
+//    @Bean
+//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(
+//            WebClient.Builder webClientBuilder) {
+//        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+//
+//        return request -> {
+//            OAuth2User user = delegate.loadUser(request);
+//
+//            if (!"github".equals(request.getClientRegistration().getRegistrationId())) {
+//                return user;
+//            }
+//
+//            OAuth2AccessToken accessToken = request.getAccessToken();
+//            String email = (String) webClientBuilder.build()
+//                    .get()
+//                    .uri("https://api.github.com/user/emails")
+//                    .headers(h -> h.setBearerAuth(accessToken.getTokenValue()))
+//                    .retrieve()
+//                    .bodyToMono(List.class)
+//                    .block()
+//                    .stream()
+//                    .filter(emailObj -> (boolean) ((Map) emailObj).get("primary"))
+//                    .map(emailObj -> (String) ((Map) emailObj).get("email"))
+//                    .findFirst()
+//                    .orElse(null);
+//
+//            Map<String, Object> attrs = new HashMap<>(user.getAttributes());
+//            attrs.put("email", email);
+//
+//            return new DefaultOAuth2User(user.getAuthorities(), attrs, "id");
+//        };
+//    }
 
 }
+
+
+

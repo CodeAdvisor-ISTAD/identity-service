@@ -29,6 +29,5 @@ public interface AuthService {
 
 	void resetPassword(ResetPasswordRequest resetPasswordRequest);
 
-	UserResponse createUser(User user);
 
 }

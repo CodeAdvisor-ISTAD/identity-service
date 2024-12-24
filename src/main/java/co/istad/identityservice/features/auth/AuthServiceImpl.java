@@ -24,6 +24,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -123,12 +125,13 @@ public class AuthServiceImpl implements AuthService {
         isNotAuthenticated(authentication);
         if (authentication instanceof OAuth2AuthenticationToken oauth2Auth) {
             // Handle Google OAuth2 authentication
-            DefaultOidcUser oidcUser = (DefaultOidcUser) oauth2Auth.getPrincipal();
-            return handleGoogleUser(oidcUser);
-        } else {
-            // Handle your custom authentication
-            return userService.findByUsername(authentication.getName());
+            if (oauth2Auth.getAuthorizedClientRegistrationId().equals("google")) {
+                return handleGoogleUser((DefaultOidcUser) oauth2Auth.getPrincipal());
+            } else if(oauth2Auth.getAuthorizedClientRegistrationId().equals("github")) {
+                return handleGitHubUser((DefaultOAuth2User) oauth2Auth.getPrincipal());
+            }
         }
+        return userService.findByUsername(authentication.getName());
     }
 
     private UserResponse handleGoogleUser(DefaultOidcUser oidcUser) {
@@ -137,23 +140,20 @@ public class AuthServiceImpl implements AuthService {
         return this.findByEmail(email)
                 .orElseGet(() -> userService.createGoogleUser(oidcUser));
     }
+
+    private UserResponse handleGitHubUser(OAuth2User oauth2User) {
+        String email = oauth2User.getAttribute("email");
+
+        return this.findByEmail(email)
+                .orElseGet(() -> userService.createGithubUser(oauth2User));
+    }
+
     @Override
     public Optional<UserResponse> findByEmail(String email) {
         return userRepository.findByEmailAndIsEnabledTrue(email)
                 .map(userMapper::toUserResponse);
     }
 
-    @Override
-    public UserResponse createUser(User user) {
-        // Generate UUID if not provided
-        if (user.getUuid() == null) {
-            user.setUuid(UUID.randomUUID().toString());
-        }
-
-        // Save the user
-        User savedUser = userRepository.save(user);
-        return userMapper.toUserResponse(savedUser);
-    }
 
     @Transactional
     @Override
