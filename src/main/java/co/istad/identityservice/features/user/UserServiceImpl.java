@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -142,6 +143,40 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    // Add a new method specifically for Google users
+    @Transactional
+    public UserResponse createGoogleUser(DefaultOidcUser oidcUser) {
+        User user = User.builder()
+                .uuid(UUID.randomUUID().toString())
+                .username(generateUsername(oidcUser.getEmail()))
+                .email(oidcUser.getEmail())
+                .fullName(oidcUser.getFullName())
+                .profileImage(oidcUser.getPicture()) // Use Google profile picture
+                .coverImage("users/cover.png")
+                .emailVerified(true)
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .isEnabled(true)
+                .build();
+
+        user = userRepository.save(user);
+
+        // Set up default authority - USER
+        UserAuthority defaultUserAuthority = new UserAuthority();
+        defaultUserAuthority.setUser(user);
+        defaultUserAuthority.setAuthority(authorityRepository.AUTH_USER());
+
+        user.setUserAuthorities(new HashSet<>());
+        user.getUserAuthorities().add(defaultUserAuthority);
+
+        userAuthorityRepository.saveAll(user.getUserAuthorities());
+
+        return userMapper.toUserResponse(user);
+    }
+
+
+
     @Override
     public Page<UserResponse> findList(int pageNumber, int pageSize) {
 
@@ -223,6 +258,14 @@ public class UserServiceImpl implements UserService {
     public void verifyEmail(User user) {
         user.setEmailVerified(true);
         userRepository.save(user);
+    }
+
+    // Helper method to generate username from email
+    private String generateUsername(String email) {
+        // Remove domain part and special characters
+        return email.split("@")[0]
+                .replaceAll("[^a-zA-Z0-9]", "")
+                .toLowerCase();
     }
 
 

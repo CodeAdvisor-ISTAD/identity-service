@@ -7,8 +7,12 @@ import co.istad.identityservice.features.user.dto.UserCreateRequest;
 import co.istad.identityservice.features.user.dto.UserPasswordResetResponse;
 import co.istad.identityservice.features.user.dto.UserResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+
+import java.util.Optional;
 
 public interface UserService {
+
 
     UserResponse updateBasicInfo(String username, UserBasicInfoRequest userBasicInfoRequest);
 
@@ -19,6 +23,8 @@ public interface UserService {
     void disable(String username);
 
     void createNewUser(UserCreateRequest userCreateRequest);
+
+    UserResponse createGoogleUser(DefaultOidcUser oidcUser);
 
     Page<UserResponse> findList(int pageNumber, int pageSize);
 
@@ -37,5 +43,7 @@ public interface UserService {
     void checkForOldPassword(String username, String oldPassword);
 
     void processOAuthPostLogin(String username);
+
+
 
 }

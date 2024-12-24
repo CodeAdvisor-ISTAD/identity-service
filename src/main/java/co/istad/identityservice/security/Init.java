@@ -5,6 +5,7 @@ import co.istad.identityservice.domain.User;
 import co.istad.identityservice.domain.UserAuthority;
 import co.istad.identityservice.features.authority.AuthorityRepository;
 import co.istad.identityservice.features.user.UserRepository;
+import co.istad.identityservice.security.repository.ClientRepository;
 import co.istad.identityservice.security.repository.JpaRegisteredClientRepository;
 import jakarta.annotation.PostConstruct;
 
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
@@ -34,6 +36,7 @@ public class Init {
     private final PasswordEncoder passwordEncoder;
     private final AuthorityRepository authorityRepository;
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
 
     @PostConstruct
     void initUserDetails() {
@@ -88,49 +91,52 @@ public class Init {
     @PostConstruct
     void initOAuth2() {
 
-        TokenSettings tokenSettings = TokenSettings.builder()
-                .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                .accessTokenTimeToLive(Duration.ofMinutes(1))
-                .build();
+        if(clientRepository.count() < 1) {
 
-        ClientSettings clientSettings = ClientSettings.builder()
-                .requireProofKey(true)
-                .requireAuthorizationConsent(false)
-                .build();
+            TokenSettings tokenSettings = TokenSettings.builder()
+                    .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                    .accessTokenTimeToLive(Duration.ofMinutes(1))
+                    .build();
 
-        var web = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("code-advisor")
-                .clientSecret(passwordEncoder.encode("qwerqwer")) // store in secret manager
-                .scopes(scopes -> {
-                    scopes.add(OidcScopes.OPENID);
-                    scopes.add(OidcScopes.PROFILE);
-                    scopes.add(OidcScopes.EMAIL);
-                })
-                .redirectUris(uris -> {
-                    uris.add("http://127.0.0.1:9090/login/oauth2/code/code-advisor");
-                    uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
-                    uris.add("http://localhost:9090/login/oauth2/code/google");
-                    uris.add("http://localhost:8168/login/oauth2/code/google");
+            ClientSettings clientSettings = ClientSettings.builder()
+                    .requireProofKey(true)
+                    .requireAuthorizationConsent(false)
+                    .build();
 
-                })
-                .postLogoutRedirectUris(uris -> {
-                    uris.add("http://127.0.0.1:8168");
-                })
-                .clientAuthenticationMethods(method -> {
-                    method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
-                }) //TODO: grant_type:client_credentials, client_id & client_secret, redirect_uri
-                .authorizationGrantTypes(grantTypes -> {
-                    grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
-                    grantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
-                })
-                .clientSettings(clientSettings)
-                .tokenSettings(tokenSettings)
-                .build();
+            var web = RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("code-advisor")
+                    .clientSecret(passwordEncoder.encode("qwerqwer")) // store in secret manager
+                    .scopes(scopes -> {
+                        scopes.add(OidcScopes.OPENID);
+                        scopes.add(OidcScopes.PROFILE);
+                        scopes.add(OidcScopes.EMAIL);
+                    })
+                    .redirectUris(uris -> {
+                        uris.add("http://127.0.0.1:9090/login/oauth2/code/code-advisor");
+                        uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
+                        uris.add("http://localhost:9090/login/oauth2/code/google");
+                        uris.add("http://localhost:8168/login/oauth2/code/google");
 
-        RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("codeadvisor");
+                    })
+                    .postLogoutRedirectUris(uris -> {
+                        uris.add("http://127.0.0.1:8168");
+                    })
+                    .clientAuthenticationMethods(method -> {
+                        method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                    }) //TODO: grant_type:client_credentials, client_id & client_secret, redirect_uri
+                    .authorizationGrantTypes(grantTypes -> {
+                        grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                        grantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
+                    })
+                    .clientSettings(clientSettings)
+                    .tokenSettings(tokenSettings)
+                    .build();
 
-        if (registeredClient == null) {
-            jpaRegisteredClientRepository.save(web);
+            RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("codeadvisor");
+
+            if (registeredClient == null) {
+                jpaRegisteredClientRepository.save(web);
+            }
         }
 
     }

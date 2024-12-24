@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -111,7 +112,7 @@ public class SecurityConfig {
 //        return http.build();
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/oauth2/**", "/error","/register","/otp/**","/resend-otp","/forget-password","/reset-pwd-otp", "/reset-password").permitAll()
+                        .requestMatchers("/login", "/oauth2/**", "/error","/register","/otp/**","/resend-otp","/forget-password","/reset-pwd-otp", "/reset-password", "google").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -136,34 +137,47 @@ public class SecurityConfig {
     @Bean
     OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
         return context -> {
-
-            // TODO: Custom JWT with authorization_code grant type and Authentication
             Authentication authentication = context.getPrincipal();
-            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
+            // Handle both OAuth2 and Custom Authentication
             if (context.getTokenType().getValue().equals("id_token")) {
-                context.getClaims().claim("userUuid", customUserDetails.getUser().getUuid());
-                context.getClaims().claim("username", customUserDetails.getUser().getUsername());
-                context.getClaims().claim("fullName", customUserDetails.getUser().getFullName());
-                context.getClaims().claim("email", customUserDetails.getUser().getEmail());
-
+                if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
+                    // Handle custom user authentication
+                    context.getClaims().claim("userUuid", customUserDetails.getUser().getUuid());
+                    context.getClaims().claim("username", customUserDetails.getUser().getUsername());
+                    context.getClaims().claim("fullName", customUserDetails.getUser().getFullName());
+                    context.getClaims().claim("email", customUserDetails.getUser().getEmail());
+                } else if (authentication.getPrincipal() instanceof DefaultOidcUser oidcUser) {
+                    // Handle Google OAuth2 authentication
+                    context.getClaims().claim("email", oidcUser.getEmail());
+                    context.getClaims().claim("fullName", oidcUser.getFullName());
+                    context.getClaims().claim("picture", oidcUser.getPicture());
+                    // Add any other claims you want to include from the OAuth2 user
+                }
             }
 
             if (context.getTokenType().getValue().equals("access_token")) {
                 Set<String> scopes = new HashSet<>(context.getAuthorizedScopes());
-                authentication
-                        .getAuthorities()
+                authentication.getAuthorities()
                         .forEach(grantedAuthority -> scopes.add(grantedAuthority.getAuthority()));
+
                 context.getClaims()
                         .issuer("https://identity.istad.co")
                         .id(authentication.getName())
                         .subject(authentication.getName())
-                        .claim("scope", scopes)
-                        .claim("uuid", customUserDetails.getUser().getUuid())
-                        .claim("username", customUserDetails.getUser().getUsername())
-                        .claim("fullName", customUserDetails.getUser().getFullName());
-//                        .claim("userFullName", String.format("%s %s", customUserDetails.getUser().getFamilyName(),
-//                                customUserDetails.getUser().getGivenName()));
+                        .claim("scope", scopes);
+
+                // Add user-specific claims based on authentication type
+                if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
+                    context.getClaims()
+                            .claim("uuid", customUserDetails.getUser().getUuid())
+                            .claim("username", customUserDetails.getUser().getUsername())
+                            .claim("fullName", customUserDetails.getUser().getFullName());
+                } else if (authentication.getPrincipal() instanceof DefaultOidcUser oidcUser) {
+                    context.getClaims()
+                            .claim("email", oidcUser.getEmail())
+                            .claim("fullName", oidcUser.getFullName());
+                }
             }
         };
     }

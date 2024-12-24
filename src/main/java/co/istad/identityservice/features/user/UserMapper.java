@@ -29,4 +29,6 @@ public interface UserMapper {
 
     UserCreateRequest mapRegisterRequestToUserCreationRequest(RegisterRequest registerRequest);
 
+    UserCreateRequest fromUser(User user);
+
 }

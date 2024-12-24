@@ -3,9 +3,7 @@ package co.istad.identityservice.domain;
 
 import co.istad.identityservice.config.jpa.Auditable;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
@@ -17,6 +15,8 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "users")
+@Builder
+@AllArgsConstructor
 public class User extends Auditable<String> {
 
     @Id
