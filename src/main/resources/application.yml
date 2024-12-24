@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: prod
+
   security:
     oauth2:
       resourceserver:
@@ -17,53 +20,18 @@ spring:
             client-id: 897037474382-1eipe3mffu6ielod7kma05fbc1h3siic.apps.googleusercontent.com
             client-secret: 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
             authorization-grant-type:
-            - authorization_code
+              - authorization_code
             scope: openid, profile, email
             redirect-uri: http://localhost:8168/login/oauth2/code/google
             client-authentication-method: client_secret_post
 
   application:
     name: identity-service
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-  datasource:
-    url: jdbc:postgresql://34.50.73.18:5431/oauth2
-    username: oauth2
-    password: Code@Advisors2024
-    driver-class-name: org.postgresql.Driver
-  servlet:
-    multipart:
-      max-request-size: 10MB
-      max-file-size: 10MB
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: istad.codeadvisors@gmail.com
-    password: urfl rzjr zbcn jsvn
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
+  config:
+    import: "configserver:"
 
-server:
-  port: 9090
+  cloud:
+    config:
+      uri: http://167.172.78.79:8888
 
-logging:
-  level:
-    org:
-      springframework:
-#        web: DEBUG
-#        mail: DEBUG
-        security: DEBUG
-eureka:
-  instance:
-    preferIpAddress: true
-  client:
-    fetchRegistry: true
-    registerWithEureka: true
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/

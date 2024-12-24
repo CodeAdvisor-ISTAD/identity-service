@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  identity-service:
+    container_name: identity-service # Set the container name
+    build:
+      context: . # Use the current directory for building
+    ports:
+      - "9090:9090" # Map the application port
+    #    environment:
+    #      SPRING_PROFILES_ACTIVE: prod # Set Spring profile if needed
+    volumes:
+      - identity-logs:/app/logs # Optional: Map logs to a local directory
+
+volumes:
+  identity-logs:
