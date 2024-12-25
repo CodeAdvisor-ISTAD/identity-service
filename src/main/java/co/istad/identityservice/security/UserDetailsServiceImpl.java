@@ -33,7 +33,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + username + " not found"));
 
 
-
         CustomUserDetails customUserDetails = new CustomUserDetails();
         customUserDetails.setUser(user);
 

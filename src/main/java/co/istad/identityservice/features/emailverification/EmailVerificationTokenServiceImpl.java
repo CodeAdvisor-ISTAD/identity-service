@@ -16,6 +16,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.time.LocalTime;
 import java.util.Objects;
@@ -31,6 +33,8 @@ public class EmailVerificationTokenServiceImpl implements EmailVerificationToken
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final UserRepository userRepository;
     private final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
+
 
 
     @Override
@@ -100,10 +104,14 @@ public class EmailVerificationTokenServiceImpl implements EmailVerificationToken
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
 
         try {
+            Context context = new Context();
+            context.setVariable("verifyCode", emailVerificationToken.getToken());
+            String htmlTemplate = templateEngine.process("email", context);
+
             mimeMessageHelper.setFrom(botEmail);
             mimeMessageHelper.setTo(user.getEmail());
             mimeMessageHelper.setSubject("Account Verification");
-            mimeMessageHelper.setText(emailVerificationToken.getToken());
+            mimeMessageHelper.setText(htmlTemplate, true);
             javaMailSender.send(mimeMessage);
             log.info("Email has been sent to {}", user.getEmail());
         } catch (MessagingException e) {

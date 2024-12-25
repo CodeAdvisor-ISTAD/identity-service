@@ -34,6 +34,17 @@
         .color_primary {
             color: #000040;
         }
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 5px solid rgba(0, 0, 0, 0.2); /* Create a border for the spinner */
+            border-top-color: white; /* Color of the spinning part */
+            animation: spin 1s linear infinite; /* Apply the spin animation */
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -55,7 +66,7 @@
             មានគណនីរួចហើយ?
             <a href="/login" class="underline color_primary bold">ចូលប្រើ </a>
         </p>
-        <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="space-y-6">
+        <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="space-y-6" id="register-form">
             <div>
                 <label
                         for="fullName"
@@ -193,11 +204,14 @@
                 ដោយបង្កើតគណនី, អ្នកយល់ព្រមនឹងលក្ខខណ្ឌប្រើប្រាស់ និងគោលការណ៍ឯកជនភាព
             </p>
             <button
+                    id="register-button"
                     type="submit"
                     class="w-full bg_primary text-white py-3 rounded-lg font-medium transition khmer"
             >
-                បង្កើតគណនី
+                <span id="button-text">បង្កើតគណនី</span>
+                <div id="loading-spinner" class="hidden ml-2 w-5 h-5 border-4 border-white rounded-full spinner"></div>
             </button>
+
         </form>
         <div class="flex items-center my-6">
             <div class="flex-grow h-px bg-gray-300"></div>
@@ -230,6 +244,18 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const registerButton = document.getElementById("register-button");
+        const loadingSpinner = document.getElementById("loading-spinner");
+        const registerForm = document.getElementById("register-form");
+        const buttonText = document.getElementById("button-text");
+
+        registerForm.addEventListener("submit", () => {
+            registerButton.disabled = true;
+            buttonText.classList.add("hidden");
+            loadingSpinner.classList.remove("hidden");
+        });
+
+
         const toggleVisibility = (toggleButtonId, inputId, eyeIconId) => {
             const button = document.getElementById(toggleButtonId);
             const input = document.getElementById(inputId);
