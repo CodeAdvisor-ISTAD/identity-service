@@ -181,7 +181,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(oAuth2User.getAttribute("login"))
-                .email("github_" + oAuth2User.getAttribute("id") + "@example.com")
+                .email(oAuth2User.getAttribute("login") + "@github.com")
                 .fullName(oAuth2User.getAttribute("name"))
                 .profileImage(oAuth2User.getAttribute("avatar_url")) // Use Google profile picture
                 .coverImage("users/cover.png")

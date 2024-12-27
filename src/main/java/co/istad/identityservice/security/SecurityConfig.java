@@ -1,5 +1,8 @@
 package co.istad.identityservice.security;
 
+import co.istad.identityservice.domain.User;
+import co.istad.identityservice.features.user.UserRepository;
+import co.istad.identityservice.features.user.UserService;
 import co.istad.identityservice.security.custom.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +19,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
@@ -30,12 +28,14 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
@@ -47,6 +47,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
 
     @Bean
@@ -72,7 +73,6 @@ public class SecurityConfig {
     @Bean
     @Order(1)
     SecurityFilterChain configureOAuth2(HttpSecurity http) throws Exception {
-
 
 
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
@@ -125,14 +125,14 @@ public class SecurityConfig {
 //        return http.build();
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/oauth2/**", "/error","/register","/otp/**","/resend-otp","/forget-password","/reset-pwd-otp", "/reset-password", "/google","http://localhost:8168","/github").permitAll()
+                        .requestMatchers("/login", "/oauth2/**", "/error", "/register", "/otp/**", "/resend-otp", "/forget-password", "/reset-pwd-otp", "/reset-password", "/google", "http://localhost:8168", "/github").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                                .loginPage("/login")
+                                .loginProcessingUrl("/login")
 //                        .defaultSuccessUrl("http://localhost:8168/", true)
-                        .failureUrl("/login?error=true")
+                                .failureUrl("/login?error=true")
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
@@ -201,64 +201,46 @@ public class SecurityConfig {
     }
 
     private void addGoogleUserClaims(JwtEncodingContext context, DefaultOidcUser user) {
-        context.getClaims()
-                .claim("email", user.getEmail())
-                .claim("fullName", user.getFullName())
-                .claim("picture", user.getPicture());
+        String email = user.getEmail();
+        userRepository.findByEmail(email)
+                .ifPresentOrElse(
+                        userEntity -> {
+                            context.getClaims()
+                                    .claim("userUuid", userEntity.getUuid())
+                                    .claim("username", userEntity.getUsername())
+                                    .claim("fullName", userEntity.getFullName())
+                                    .claim("profileImage", userEntity.getProfileImage())
+                                    .claim("email", userEntity.getEmail());
+
+                        },
+                        () -> {
+                            context.getClaims()
+                                    .claim("email", email)
+                                    .claim("fullName", user.getFullName());
+                        }
+                );
+
     }
 
     private void addGithubUserClaims(JwtEncodingContext context, DefaultOAuth2User user) {
         Map<String, Object> claims = new HashMap<>();
 
-        String email = user.getAttribute("email");
+        User user1 = userRepository.findByUsername(user.getAttribute("login")).orElse(null);
 
-        if (email != null) {
-            claims.put("email", email);
-        } else {
-            claims.put("email", "random@example.com");
+        if (user1 != null) {
+            claims.put("userUuid", user1.getUuid());
+            claims.put("username", user1.getUsername());
+            claims.put("email", user.getAttribute("login")+ "@github.com");
         }
         if (user.getAttribute("name") != null) {
             claims.put("fullName", user.getAttribute("name"));
         }
         if (user.getAttribute("avatar_url") != null) {
-            claims.put("picture", user.getAttribute("avatar_url"));
+            claims.put("profileImage", user.getAttribute("avatar_url"));
         }
 
         claims.forEach((key, value) -> context.getClaims().claim(key, value));
     }
-
-//    @Bean
-//    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(
-//            WebClient.Builder webClientBuilder) {
-//        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-//
-//        return request -> {
-//            OAuth2User user = delegate.loadUser(request);
-//
-//            if (!"github".equals(request.getClientRegistration().getRegistrationId())) {
-//                return user;
-//            }
-//
-//            OAuth2AccessToken accessToken = request.getAccessToken();
-//            String email = (String) webClientBuilder.build()
-//                    .get()
-//                    .uri("https://api.github.com/user/emails")
-//                    .headers(h -> h.setBearerAuth(accessToken.getTokenValue()))
-//                    .retrieve()
-//                    .bodyToMono(List.class)
-//                    .block()
-//                    .stream()
-//                    .filter(emailObj -> (boolean) ((Map) emailObj).get("primary"))
-//                    .map(emailObj -> (String) ((Map) emailObj).get("email"))
-//                    .findFirst()
-//                    .orElse(null);
-//
-//            Map<String, Object> attrs = new HashMap<>(user.getAttributes());
-//            attrs.put("email", email);
-//
-//            return new DefaultOAuth2User(user.getAuthorities(), attrs, "id");
-//        };
-//    }
 
 }
 
