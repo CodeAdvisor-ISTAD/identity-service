@@ -187,7 +187,6 @@ public class SecurityConfig {
                 .forEach(auth -> scopes.add(auth.getAuthority()));
 
         context.getClaims()
-                .issuer("https://identity.istad.co")
                 .id(authentication.getName())
                 .subject(authentication.getName())
                 .claim("scope", scopes);
