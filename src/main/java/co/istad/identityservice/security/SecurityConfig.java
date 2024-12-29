@@ -187,6 +187,7 @@ public class SecurityConfig {
                 .forEach(auth -> scopes.add(auth.getAuthority()));
 
         context.getClaims()
+//                .issuer("https://identity.istad.com") custom issuer is not working
                 .id(authentication.getName())
                 .subject(authentication.getName())
                 .claim("scope", scopes);
