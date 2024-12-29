@@ -4,6 +4,7 @@ package co.istad.identityservice.features.user;
 import co.istad.identityservice.domain.Authority;
 import co.istad.identityservice.domain.User;
 import co.istad.identityservice.domain.UserAuthority;
+import co.istad.identityservice.features.auth.dto.UserCreatedEvent;
 import co.istad.identityservice.features.authority.AuthorityRepository;
 import co.istad.identityservice.features.emailverification.EmailVerificationTokenService;
 import co.istad.identityservice.features.user.dto.UserBasicInfoRequest;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -297,6 +299,11 @@ public class UserServiceImpl implements UserService {
         return email.split("@")[0]
                 .replaceAll("[^a-zA-Z0-9]", "")
                 .toLowerCase();
+    }
+
+    @KafkaListener(topics = "user-created-events-topic", groupId = "identity-service")
+    private void userCreatedEvent(UserCreatedEvent userCreatedEvent) {
+        log.info("User created event: {}", userCreatedEvent);
     }
 
 

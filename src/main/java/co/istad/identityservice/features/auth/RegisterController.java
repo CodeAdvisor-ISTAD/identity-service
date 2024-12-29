@@ -1,15 +1,15 @@
 package co.istad.identityservice.features.auth;
 
-import co.istad.identityservice.features.auth.dto.ForgetPasswordRequest;
-import co.istad.identityservice.features.auth.dto.OtpRequest;
-import co.istad.identityservice.features.auth.dto.RegisterRequest;
-import co.istad.identityservice.features.auth.dto.ResetPasswordRequest;
+import co.istad.identityservice.domain.User;
+import co.istad.identityservice.features.auth.dto.*;
 import co.istad.identityservice.features.emailverification.EmailVerificationTokenService;
 import co.istad.identityservice.features.emailverification.dto.EmailVerifyRequest;
+import co.istad.identityservice.features.user.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,6 +28,8 @@ public class RegisterController {
 
     private final AuthService authService;
     private final EmailVerificationTokenService emailVerificationTokenService;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final UserRepository userRepository;
 
 
     @GetMapping("/forget-password")
@@ -205,6 +207,8 @@ public class RegisterController {
         String username = (String) session.getAttribute("username");
         model.addAttribute("userName", username);
 
+
+
         log.info("result has errors: {}", result.getModel());
 
 
@@ -216,6 +220,17 @@ public class RegisterController {
         try {
             emailVerificationTokenService.verify(emailVerifyRequest);
             model.addAttribute("successMessage", "OTP verified successfully!");
+            User user = userRepository.findByUsername(username).orElse(null);
+            assert user != null;
+
+            Object userCreated = UserCreatedEvent.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .fullName(user.getFullName())
+                    .build();
+
+            kafkaTemplate.send("user-created-events-topic", String.valueOf(user.getId()), userCreated );
+            log.info("User created event sent to Kafka");
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", "OTP verification failed. Please try again.");
