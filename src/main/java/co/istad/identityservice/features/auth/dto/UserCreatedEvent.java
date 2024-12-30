@@ -18,4 +18,6 @@ public class UserCreatedEvent {
 
     private String fullName;
 
+    private String uuid;
+
 }

@@ -227,6 +227,7 @@ public class RegisterController {
                     .username(user.getUsername())
                     .email(user.getEmail())
                     .fullName(user.getFullName())
+                    .uuid(user.getUuid())
                     .build();
 
             kafkaTemplate.send("user-created-events-topic", String.valueOf(user.getId()), userCreated );

@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
-    
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -44,7 +44,6 @@ public class UserServiceImpl implements UserService {
     private final UserAuthorityRepository userAuthorityRepository;
     private final AuthorityRepository authorityRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
 
 
     @Override
@@ -143,11 +142,7 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.getUserAuthorities().addAll(customAuthorities);
         }
-        kafkaTemplate.send("user-created-events-topic", UserCreatedEvent.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .fullName(user.getFullName())
-                .build());
+
 
         userAuthorityRepository.saveAll(user.getUserAuthorities());
 
@@ -182,10 +177,11 @@ public class UserServiceImpl implements UserService {
 
         userAuthorityRepository.saveAll(user.getUserAuthorities());
 
-        kafkaTemplate.send("user-created-events-topic", UserCreatedEvent.builder()
+        kafkaTemplate.send("user-created-events-topic", String.valueOf(user.getId()), UserCreatedEvent.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
+                .uuid(user.getUuid())
                 .build());
 
         return userMapper.toUserResponse(user);
@@ -218,6 +214,14 @@ public class UserServiceImpl implements UserService {
         user.getUserAuthorities().add(defaultUserAuthority);
 
         userAuthorityRepository.saveAll(user.getUserAuthorities());
+
+        kafkaTemplate.send("user-created-events-topic", String.valueOf(user.getId()), UserCreatedEvent.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .uuid(user.getUuid())
+                .build());
+
 
         return userMapper.toUserResponse(user);
     }
