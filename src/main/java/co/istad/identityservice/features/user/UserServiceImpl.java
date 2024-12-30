@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final EmailVerificationTokenService emailVerificationTokenService;
     private final UserAuthorityRepository userAuthorityRepository;
     private final AuthorityRepository authorityRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
 
 
@@ -141,6 +143,11 @@ public class UserServiceImpl implements UserService {
                     .collect(Collectors.toSet());
             user.getUserAuthorities().addAll(customAuthorities);
         }
+        kafkaTemplate.send("user-created-events-topic", UserCreatedEvent.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .build());
 
         userAuthorityRepository.saveAll(user.getUserAuthorities());
 
@@ -174,6 +181,12 @@ public class UserServiceImpl implements UserService {
         user.getUserAuthorities().add(defaultUserAuthority);
 
         userAuthorityRepository.saveAll(user.getUserAuthorities());
+
+        kafkaTemplate.send("user-created-events-topic", UserCreatedEvent.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .build());
 
         return userMapper.toUserResponse(user);
     }
