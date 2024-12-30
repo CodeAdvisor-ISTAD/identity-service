@@ -219,7 +219,7 @@
             <div class="flex-grow h-px bg-gray-300"></div>
         </div>
         <div class="space-y-4">
-            <button
+            <a th:href="@{/oauth2/authorization/google}"
                     class="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-200 transition khmer flex items-center justify-center"
             >
                 <img
@@ -228,8 +228,8 @@
                         class="w-6 h-6 mr-2"
                 />
                 ភ្ជាប់ជាមួយ Google
-            </button>
-            <button
+            </a>
+            <a th:href="@{/oauth2/authorization/github}"
                     class="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-medium border border-gray-300 hover:bg-gray-200 transition khmer flex items-center justify-center"
             >
                 <img
@@ -238,7 +238,7 @@
                         class="w-6 h-6 mr-2"
                 />
                 ភ្ជាប់ជាមួយ GitHub
-            </button>
+            </a>
         </div>
     </div>
 </div>

@@ -50,4 +50,6 @@ public class AuthController {
         return new BasedMessage("Password has been changed");
     }
 
+
+
 }
