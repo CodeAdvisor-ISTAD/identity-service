@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
@@ -182,6 +181,7 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .uuid(user.getUuid())
+                .profileImage(user.getProfileImage())
                 .build());
 
         return userMapper.toUserResponse(user);
@@ -215,11 +215,13 @@ public class UserServiceImpl implements UserService {
 
         userAuthorityRepository.saveAll(user.getUserAuthorities());
 
+
         kafkaTemplate.send("user-created-events-topic", String.valueOf(user.getId()), UserCreatedEvent.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .uuid(user.getUuid())
+                .profileImage(user.getProfileImage())
                 .build());
 
 
@@ -316,11 +318,6 @@ public class UserServiceImpl implements UserService {
         return email.split("@")[0]
                 .replaceAll("[^a-zA-Z0-9]", "")
                 .toLowerCase();
-    }
-
-    @KafkaListener(topics = "user-created-events-topic", groupId = "identity-service")
-    private void userCreatedEvent(UserCreatedEvent userCreatedEvent) {
-        log.info("User created event: {}", userCreatedEvent);
     }
 
 

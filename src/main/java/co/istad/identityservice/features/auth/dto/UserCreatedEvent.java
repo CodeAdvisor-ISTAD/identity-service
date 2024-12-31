@@ -20,4 +20,6 @@ public class UserCreatedEvent {
 
     private String uuid;
 
+    private String profileImage;
+
 }
