@@ -1,7 +1,6 @@
 spring:
   profiles:
     active: dev
-
   security:
     oauth2:
       resourceserver:
@@ -15,6 +14,8 @@ spring:
           github:
             client-id: Iv23liBU3E9AkNiEfed2
             client-secret: cca664d184ea46d005f9602f7e9ab1fbb560ba07
+
+
 
 
   application:
