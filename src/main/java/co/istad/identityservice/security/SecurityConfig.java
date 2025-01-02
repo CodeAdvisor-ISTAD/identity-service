@@ -131,7 +131,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
-//                        .defaultSuccessUrl("http://localhost:8168/", true)
+                                .defaultSuccessUrl("http://localhost:8168/", true)
                                 .failureUrl("/login?error=true")
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -143,6 +143,9 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("http://127.0.0.1:8168")
+                        .deleteCookies("JSESSIONID", "SESSION")
+                        .clearAuthentication(true)
+
                 )
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable);
