@@ -145,6 +145,15 @@ public class UserServiceImpl implements UserService {
 
         userAuthorityRepository.saveAll(user.getUserAuthorities());
 
+        kafkaTemplate.send("user-created-events-topic", String.valueOf(user.getId()), UserCreatedEvent.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .uuid(user.getUuid())
+                .profileImage(user.getProfileImage())
+                .build());
+
+
     }
 
     // Add a new method specifically for Google users
