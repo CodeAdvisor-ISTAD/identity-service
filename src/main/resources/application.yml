@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: seu
+    active: prod
   security:
     oauth2:
       resourceserver:
