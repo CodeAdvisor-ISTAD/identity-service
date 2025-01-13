@@ -1,6 +1,7 @@
 package co.istad.identityservice.features.user;
 
 
+import co.istad.identityservice.config.kafka.eventClass.UpdateUserEvent;
 import co.istad.identityservice.domain.User;
 import co.istad.identityservice.features.auth.dto.RegisterRequest;
 import co.istad.identityservice.features.user.dto.*;
@@ -13,6 +14,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
+    User mappedFromUpdateUserEvent(UpdateUserEvent updateUserEvent);
 
     User registerRequestToUser(RegisterRequest registerRequest);
 
