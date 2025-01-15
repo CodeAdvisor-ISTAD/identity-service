@@ -17,6 +17,7 @@ import java.util.Set;
 @Table(name = "users")
 @Builder
 @AllArgsConstructor
+@ToString
 public class User extends Auditable<String> {
 
     @Id
@@ -53,7 +54,6 @@ public class User extends Auditable<String> {
     @Column(nullable = false, length = 64)
     private String fullName;
 
-    @Column(unique = true)
     private String phoneNumber;
 
     private String gender;

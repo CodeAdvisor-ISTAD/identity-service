@@ -4,12 +4,16 @@ import co.istad.identityservice.config.kafka.eventClass.UpdateUserEvent;
 import co.istad.identityservice.domain.User;
 import co.istad.identityservice.features.user.UserMapper;
 import co.istad.identityservice.features.user.UserRepository;
+import co.istad.identityservice.features.user.dto.UpdateUserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @Slf4j
 @Component
@@ -21,16 +25,38 @@ public class IdentityConsumer {
     private final UserMapper userMapper;
 
     @KafkaListener(
-            topics = "user-service-topic",
+            topics = "user-updated-event-topic",
             groupId = "user-service",
             containerFactory = "kafkaListenerContainerFactory"
     )
     void consumeUpdateUserEvent(@Payload UpdateUserEvent updateUserEvent) {
         try {
-            log.info("Received message: {}", updateUserEvent);
 
-            User user = userMapper.mappedFromUpdateUserEvent(updateUserEvent);
-            userRepository.save(user);
+            User existingUser = userRepository.findByUsername(updateUserEvent.getUsername())
+                    .orElseThrow();
+
+
+            UpdateUserDto updateUserDto = userMapper.mappedFromUpdateUserEvent(updateUserEvent);
+            if (updateUserDto.getDob() == null || updateUserDto.getDob().trim().isEmpty()) {
+                // Handle null/empty case - either set to null or throw exception
+                existingUser.setDob(null);
+            } else {
+                try {
+                    existingUser.setDob(LocalDate.parse(updateUserDto.getDob()));
+                } catch (DateTimeParseException e) {
+                    throw new IllegalArgumentException("Invalid date format. Please use YYYY-MM-DD format", e);
+                }
+            }
+            existingUser.setFullName(updateUserDto.getFullName());
+            existingUser.setGender(updateUserDto.getGender());
+            existingUser.setPhoneNumber(updateUserDto.getPhoneNumber());
+            existingUser.setEmail(updateUserDto.getEmail());
+            existingUser.setProfileImage(updateUserDto.getProfileImage());
+            existingUser.setCoverImage(updateUserDto.getCoverColor());
+
+            log.info("consumed user: {}", existingUser);
+
+            userRepository.save(existingUser);
 
             // Your processing logic here
         } catch (Exception e) {
