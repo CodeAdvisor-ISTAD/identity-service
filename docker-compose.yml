@@ -8,10 +8,10 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod # Set Spring profile if needed
     volumes:
-      - identity-logs:/app/logs # Optional: Map logs to a local directory
+      - code-advisors-identity-logs:/app/logs # Optional: Map logs to a local directory
 
 volumes:
-  identity-logs:
+  code-advisors-identity-logs:
 
 networks:
   default:
