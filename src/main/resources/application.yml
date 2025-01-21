@@ -1,19 +1,19 @@
 spring:
-  profiles:
-    active: dev
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://127.0.0.1:9090
-      client:
-        registration:
-          google:
-            client-id: 897037474382-vgr82njacir6c71vbcbrtuinhr3h2p4r.apps.googleusercontent.com
-            client-secret: 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
-          github:
-            client-id: Iv23liBU3E9AkNiEfed2
-            client-secret: cca664d184ea46d005f9602f7e9ab1fbb560ba07
+#  profiles:
+#    active: prod
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://127.0.0.1:9090
+#      client:
+#        registration:
+#          google:
+#            client-id: 897037474382-vgr82njacir6c71vbcbrtuinhr3h2p4r.apps.googleusercontent.com
+#            client-secret: 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
+#          github:
+#            client-id: Iv23liBU3E9AkNiEfed2
+#            client-secret: cca664d184ea46d005f9602f7e9ab1fbb560ba07
   kafka:
     bootstrap-servers:
       - 167.172.78.79:29093

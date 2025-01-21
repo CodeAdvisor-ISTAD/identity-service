@@ -8,7 +8,7 @@ COPY . .
 RUN chmod +x gradlew
 
 # Build the application
-RUN ./gradlew clean build -x test
+RUN ./gradlew clean build
 
 FROM openjdk:21-jdk
 
@@ -16,6 +16,6 @@ WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-EXPOSE 8080
+EXPOSE 9090
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
