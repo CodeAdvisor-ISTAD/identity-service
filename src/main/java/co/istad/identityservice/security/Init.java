@@ -114,12 +114,13 @@ public class Init {
                     .redirectUris(uris -> {
                         uris.add("http://127.0.0.1:9090/login/oauth2/code/code-advisor");
                         uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
-                        uris.add("http://localhost:9090/login/oauth2/code/google");
-                        uris.add("http://localhost:8168/login/oauth2/code/google");
+                        uris.add("http://202.178.125.77:9090/login/oauth2/code/code-advisor");
 
                     })
                     .postLogoutRedirectUris(uris -> {
                         uris.add("http://127.0.0.1:8168");
+                        uris.add("http://202.178.125.77:8168");
+
                     })
                     .clientAuthenticationMethods(method -> {
                         method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);

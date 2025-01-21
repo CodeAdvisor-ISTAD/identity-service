@@ -1,49 +1,6 @@
 spring:
 #  profiles:
-#    active: prod
-#  security:
-#    oauth2:
-#      resourceserver:
-#        jwt:
-#          issuer-uri: http://127.0.0.1:9090
-#      client:
-#        registration:
-#          google:
-#            client-id: 897037474382-vgr82njacir6c71vbcbrtuinhr3h2p4r.apps.googleusercontent.com
-#            client-secret: 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
-#          github:
-#            client-id: Iv23liBU3E9AkNiEfed2
-#            client-secret: cca664d184ea46d005f9602f7e9ab1fbb560ba07
-  kafka:
-    bootstrap-servers:
-      - 167.172.78.79:29093
-      - 167.172.78.79:39093
-      - 167.172.78.79:49093
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.trusted.packages: "*"
-    consumer:
-      group-id: user-service
-      auto-offset-reset: earliest
-      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      properties:
-        spring.json.trusted.packages: '*'
-        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
-        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-        spring.json.value.default.type: co.istad.identityservice.config.kafka.eventClass.UpdateUserEvent
-
-    security:
-      protocol: SSL
-    ssl:
-      trust-store-location: classpath:kafka.server.truststore.jks
-      trust-store-password: password123
-      key-store-location: classpath:kafka.server.keystore.jks
-      key-store-password: password123
-      key-password: password123
-
+#    active: dev
   application:
     name: identity-service
   config:
@@ -51,3 +8,8 @@ spring:
   cloud:
     config:
       uri: http://167.172.78.79:8888
+
+
+code-advisors:
+  ip: 202.178.125.77
+  port: 9090
