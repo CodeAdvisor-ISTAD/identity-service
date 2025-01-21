@@ -12,3 +12,8 @@ services:
 
 volumes:
   identity-logs:
+
+networks:
+  default:
+    external:
+      name: code-advisors-network
