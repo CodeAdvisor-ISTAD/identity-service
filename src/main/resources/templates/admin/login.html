@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>CodeAdvisors - Login</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css"
+            rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Koh+Santepheap:wght@400;700&display=swap"
+            rel="stylesheet"
+    />
+    <style>
+        body {
+            font-family: "Roboto", sans-serif;
+        }
+
+        .khmer {
+            font-family: "Koh Santepheap", sans-serif;
+        }
+
+        .bg_primary {
+            background: #000040;
+        }
+
+        .bg_primary:hover {
+            background: #000050;
+        }
+
+        .color_primary {
+            color: #000040;
+        }
+
+        .pointer {
+            cursor: pointer;
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 5px solid rgba(0, 0, 0, 0.2); /* Create a border for the spinner */
+            border-top-color: white; /* Color of the spinning part */
+            animation: spin 1s linear infinite; /* Apply the spin animation */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+<div class="flex justify-center items-center min-h-screen m-5">
+    <div class="rounded-lg px-10 pb-10 pt-3 w-full max-w-xl bg-white shadow-lg">
+        <div class="flex justify-center mb-1">
+            <img
+                    src="http://167.172.78.79:8090/api/v1/files/preview?fileName=b5d01918-2824-48d7-83e0-fb557ce6bd73_2024-12-21T18-28-24.856529397.jpg"
+                    alt="CodeAdvisors Logo"
+                    class="w-36 rounded-full"
+            />
+        </div>
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-8 khmer">
+            ចូលរួមជាមួយសហគមន៍ CodeAdvisors
+        </h1>
+
+        <!-- Login Form with Spring Security -->
+        <form id="loginForm" th:action="@{/login}" method="post" class="space-y-6">
+            <!-- Error Message -->
+            <div th:if="${param.error}"
+                 class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <span class="block sm:inline khmer">ពាក្យសម្ងាត់ ឬ អ៊ីមែល មិនត្រឹមត្រូវ</span>
+            </div>
+
+            <div>
+                <label
+                        for="username"
+                        class="block text-sm font-medium text-gray-700 mb-2 khmer"
+                >អាសយដ្ឋានអ៊ីមែល</label
+                >
+                <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="អ៊ីមែលរបស់អ្នក"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer"
+                        required
+                />
+            </div>
+            <div>
+                <div class="flex justify-between">
+                    <label
+                            for="password"
+                            class="block text-sm font-medium text-gray-700 mb-2 khmer"
+                    >ពាក្យសម្ងាត់</label
+                    >
+                    <a href="/forget-password" class="color_primary underline khmer text-sm pointer">ភ្លេចពាក្យសម្ងាត់</a>
+                </div>
+                <div class="relative">
+                    <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="ពាក្យសម្ងាត់របស់អ្នក"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300 khmer pr-10"
+                            required
+                    />
+                    <button
+                            type="button"
+                            id="toggle-password"
+                            class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-600"
+                    >
+                        <svg id="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
+                            <path d="M14.83 9.17999C14.2706 8.61995 13.5576 8.23846 12.7813 8.08386C12.0049 7.92926 11.2002 8.00851 10.4689 8.31152C9.73758 8.61453 9.11264 9.12769 8.67316 9.78607C8.23367 10.4444 7.99938 11.2184 8 12.01C7.99916 13.0663 8.41619 14.08 9.16004 14.83" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 16.01C13.0609 16.01 14.0783 15.5886 14.8284 14.8384C15.5786 14.0883 16 13.0709 16 12.01" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M17.61 6.39004L6.38 17.62C4.6208 15.9966 3.14099 14.0944 2 11.99C6.71 3.76002 12.44 1.89004 17.61 6.39004Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20.9994 3L17.6094 6.39" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.38 17.62L3 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19.5695 8.42999C20.4801 9.55186 21.2931 10.7496 21.9995 12.01C17.9995 19.01 13.2695 21.4 8.76953 19.23" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button
+                    id="submit-button"
+                    type="submit"
+                    class="w-full bg_primary text-white py-3 rounded-lg font-medium transition khmer flex items-center justify-center"
+            >
+                <span id="button-text">ចូលប្រើ</span>
+                <div id="loading-spinner" class="hidden ml-2 w-5 h-5 border-4 border-white rounded-full spinner"></div>
+            </button>
+        </form>
+
+        <div class="flex items-center my-6">
+            <div class="flex-grow h-px bg-gray-300"></div>
+            <span class="px-4 text-sm text-gray-500 khmer">ឬ</span>
+            <div class="flex-grow h-px bg-gray-300"></div>
+        </div>
+
+        <p class="text-center text-gray-400 text-sm pt-5">
+            Secure Login with reCAPTCHA subject <br/>to Google Terms & Privacy
+        </p>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('password');
+        const togglePasswordButton = document.getElementById('toggle-password');
+        const eyeIcon = document.getElementById('eye-icon');
+        const loginForm = document.getElementById('loginForm');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        // Password visibility toggle
+        togglePasswordButton.addEventListener('click', function () {
+            const isPasswordVisible = passwordInput.type === 'text';
+            passwordInput.type = isPasswordVisible ? 'password' : 'text';
+            eyeIcon.innerHTML = isPasswordVisible
+                ? `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M14.83 9.17999C14.2706 8.61995 13.5576 8.23846 12.7813 8.08386C12.0049 7.92926 11.2002 8.00851 10.4689 8.31152C9.73758 8.61453 9.11264 9.12769 8.67316 9.78607C8.23367 10.4444 7.99938 11.2184 8 12.01C7.99916 13.0663 8.41619 14.08 9.16004 14.83" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 16.01C13.0609 16.01 14.0783 15.5886 14.8284 14.8384C15.5786 14.0883 16 13.0709 16 12.01" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M17.61 6.39004L6.38 17.62C4.6208 15.9966 3.14099 14.0944 2 11.99C6.71 3.76002 12.44 1.89004 17.61 6.39004Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M20.9994 3L17.6094 6.39" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6.38 17.62L3 21" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M19.5695 8.42999C20.4801 9.55186 21.2931 10.7496 21.9995 12.01C17.9995 19.01 13.2695 21.4 8.76953 19.23" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`
+                : `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.0007 12C15.0007 13.6569 13.6576 15 12.0007 15C10.3439 15 9.00073 13.6569 9.00073 12C9.00073 10.3431 10.3439 9 12.0007 9C13.6576 9 15.0007 10.3431 15.0007 12Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12.0012 5C7.52354 5 3.73326 7.94288 2.45898 12C3.73324 16.0571 7.52354 19 12.0012 19C16.4788 19 20.2691 16.0571 21.5434 12C20.2691 7.94291 16.4788 5 12.0012 5Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>`;
+        });
+
+        // Form submission loading state
+        loginForm.addEventListener('submit', function () {
+            submitButton.disabled = true;
+            buttonText.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+        });
+    });
+</script>
+</body>
+</html>
+
+

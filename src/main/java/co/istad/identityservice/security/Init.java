@@ -107,6 +107,10 @@ public class Init {
                     .clientId("code-advisor")
                     .clientSecret(passwordEncoder.encode("qwerqwer")) // store in secret manager
                     .scopes(scopes -> {
+                        scopes.add("ADMIN");
+                        scopes.add("USER");
+                        scopes.add("SCOPE_ADMIN");
+                        scopes.add("SCOPE_USER");
                         scopes.add(OidcScopes.OPENID);
                         scopes.add(OidcScopes.PROFILE);
                         scopes.add(OidcScopes.EMAIL);
