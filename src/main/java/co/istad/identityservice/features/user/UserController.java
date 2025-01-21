@@ -29,7 +29,7 @@ public class UserController {
                         .collect(Collectors.joining(", "));
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{username}")
     UserResponse update(@PathVariable String username, @Valid @RequestBody UserBasicInfoRequest userBasicInfoRequest) {
         return userService.updateBasicInfo(username, userBasicInfoRequest);
@@ -67,7 +67,7 @@ public class UserController {
     }
 
 
-    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     @GetMapping
     Page<UserResponse> findList(@RequestParam(required = false, defaultValue = "0") int pageNumber,
                                 @RequestParam(required = false, defaultValue = "25") int pageSize) {

@@ -1,5 +1,6 @@
 package co.istad.identityservice.security.custom;
 
+import co.istad.identityservice.domain.Authority;
 import co.istad.identityservice.domain.User;
 import co.istad.identityservice.domain.UserAuthority;
 import com.fasterxml.jackson.core.JsonParser;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
@@ -29,10 +31,30 @@ public class CustomUserDetailsDeserializer extends JsonDeserializer<CustomUserDe
 
         JsonNode userJsonNode = readJsonNode(jsonNode, "user");
 
-        Set<UserAuthority> userAuthorities = mapper.convertValue(
-                jsonNode.get("userAuthorities"),
-                SIMPLE_GRANTED_AUTHORITY_LIST
-        );
+        log.info("User JSON Node: {}", userJsonNode);
+
+//        Set<UserAuthority> userAuthorities = mapper.convertValue(
+//                jsonNode.get("userAuthorities"),
+//                SIMPLE_GRANTED_AUTHORITY_LIST
+//        );
+        // Extract authorities from the nested structure
+        Set<UserAuthority> userAuthorities = new HashSet<>();
+        if (userJsonNode.has("userAuthorities") && userJsonNode.get("userAuthorities").isArray()) {
+            JsonNode authoritiesArray = userJsonNode.get("userAuthorities").get(1); // Get the second element which contains the actual authorities
+            if (authoritiesArray.isArray()) {
+                for (JsonNode authorityNode : authoritiesArray) {
+                    if (authorityNode.has("authority") && authorityNode.get("authority").has("name")) {
+                        String authorityName = authorityNode.get("authority").get("name").asText();
+                        UserAuthority userAuthority = new UserAuthority();
+                        Authority authority = new Authority();
+                        authority.setName(authorityName);
+                        userAuthority.setAuthority(authority);
+                        userAuthorities.add(userAuthority);
+                    }
+                }
+            }
+        }
+        log.info("Extracted Authorities: {}", userAuthorities);
 
         log.info("Authorities: {}", userAuthorities);
 

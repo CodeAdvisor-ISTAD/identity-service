@@ -4,6 +4,7 @@ import co.istad.identityservice.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Slf4j
 public class CustomUserDetails implements UserDetails {
 
     private User user;
@@ -30,6 +32,7 @@ public class CustomUserDetails implements UserDetails {
                     authorities.add(new SimpleGrantedAuthority(userRole.getAuthority().getName()));
                 });
 
+        log.info("User Authorities: {}", authorities);
         return authorities;
     }
 
