@@ -115,6 +115,8 @@ public class Init {
                         uris.add("http://127.0.0.1:9090/login/oauth2/code/code-advisor");
                         uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
                         uris.add("http://202.178.125.77:1168/login/oauth2/code/code-advisor");
+                        uris.add("http://202.178.125.77:8168/login/oauth2/code/code-advisor");
+
 
                     })
                     .postLogoutRedirectUris(uris -> {
