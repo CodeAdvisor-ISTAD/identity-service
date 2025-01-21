@@ -55,10 +55,10 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final ClientRegistrationRepository clientRegistrationRepository;
 
-    @Value("${code-advisors.ip")
+    @Value("${code-advisors.ip}")
     private String codeAdvisorIp;
 
-    @Value("${code-advisors.port")
+    @Value("${code-advisors.port}")
     private String codeAdvisorPort;
 
 
@@ -136,6 +136,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("http://"+codeAdvisorIp+":"+codeAdvisorPort)
+//                        .logoutSuccessUrl("http://127.0.0.1:8168")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID") // Add any other cookies you need to clear
