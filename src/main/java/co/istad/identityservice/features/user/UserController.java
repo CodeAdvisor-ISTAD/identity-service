@@ -16,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
 
-    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PutMapping("/{username}")
     UserResponse update(@PathVariable String username, @Valid @RequestBody UserBasicInfoRequest userBasicInfoRequest) {
         return userService.updateBasicInfo(username, userBasicInfoRequest);

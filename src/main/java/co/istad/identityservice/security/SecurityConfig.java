@@ -112,9 +112,37 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     @Order(2)
+    SecurityFilterChain configureAdminSecurity(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/admin/**") // This configuration applies to admin paths
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/login").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/admin/login")
+                        .loginProcessingUrl("/admin/login")
+                        .defaultSuccessUrl("/admin/dashboard", true)
+                        .failureUrl("/admin/login?error=true")
+                )
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/admin/logout"))
+                        .logoutSuccessUrl("/admin/login")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID", "SESSION")
+                )
+                .cors(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable);
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(3)
     SecurityFilterChain configureHttpSecurity(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
