@@ -1,6 +1,6 @@
 services:
-  identity-service:
-    container_name: identity-service # Set the container name
+  code-advisors-identity-service:
+    container_name: code-advisors-identity-service # Set the container name
     build:
       context: . # Use the current directory for building
     ports:
