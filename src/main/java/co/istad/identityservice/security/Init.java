@@ -121,7 +121,7 @@ public class Init {
                     })
                     .postLogoutRedirectUris(uris -> {
                         uris.add("http://127.0.0.1:8168");
-                        uris.add("http://202.178.125.77:8168");
+                        uris.add("http://202.178.125.77:1168");
 
                     })
                     .clientAuthenticationMethods(method -> {

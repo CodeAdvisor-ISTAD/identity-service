@@ -6,6 +6,7 @@ import co.istad.identityservice.features.user.UserService;
 import co.istad.identityservice.security.custom.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -54,6 +55,11 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final ClientRegistrationRepository clientRegistrationRepository;
 
+    @Value("${code-advisors.ip")
+    private String codeAdvisorIp;
+
+    @Value("${code-advisors.port")
+    private String codeAdvisorPort;
 
 
 
@@ -129,7 +135,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("http://127.0.0.1:8168")
+                        .logoutSuccessUrl("http://"+codeAdvisorIp+":"+codeAdvisorPort)
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID") // Add any other cookies you need to clear
