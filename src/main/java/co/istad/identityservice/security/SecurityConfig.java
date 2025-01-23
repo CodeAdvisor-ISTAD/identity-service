@@ -62,7 +62,7 @@ public class SecurityConfig {
     @Value("${code-advisors.port}")
     private String codeAdvisorPort;
 
-    @Value("${redirectUrl.url}")
+    @Value("${redirect.url}")
     private String redirectUrl;
 
 
@@ -83,7 +83,7 @@ public class SecurityConfig {
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                .issuer("https://identity.code-advisors.istad.co") // Use HTTPS here
+                .issuer("https://identity.code-advisors.istad.co")
                 .build();
     }
 
