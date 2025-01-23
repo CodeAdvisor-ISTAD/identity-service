@@ -83,15 +83,7 @@ public class SecurityConfig {
                 .issuer("https://identity.code-advisors.istad.co") // Use HTTPS here
                 .build();
     }
-    @Bean
-    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
-        return factory -> factory.addAdditionalTomcatConnectors(
-                new Connector() {{
-                    setSecure(true);
-                    setScheme("https");
-                }}
-        );
-    }
+
 
 
     @Bean
