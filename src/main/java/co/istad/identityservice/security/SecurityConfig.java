@@ -6,6 +6,8 @@ import co.istad.identityservice.security.custom.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -34,6 +36,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.apache.catalina.connector.Connector;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -76,7 +79,18 @@ public class SecurityConfig {
 
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+        return AuthorizationServerSettings.builder()
+                .issuer("https://identity.code-advisors.istad.co") // Use HTTPS here
+                .build();
+    }
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
+        return factory -> factory.addAdditionalTomcatConnectors(
+                new Connector() {{
+                    setSecure(true);
+                    setScheme("https");
+                }}
+        );
     }
 
 
@@ -85,15 +99,12 @@ public class SecurityConfig {
     SecurityFilterChain configureOAuth2(HttpSecurity http) throws Exception {
 
 
-        JwtIssuerAuthenticationManagerResolver authenticationManagerResolver = JwtIssuerAuthenticationManagerResolver
-                .fromTrustedIssuers("http://identity.code-advisors.istad.co");
+//        JwtIssuerAuthenticationManagerResolver authenticationManagerResolver = JwtIssuerAuthenticationManagerResolver
+//                .fromTrustedIssuers("http://identity.code-advisors.istad.co");
 
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
         http
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .authenticationManagerResolver(authenticationManagerResolver)
-                )
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
