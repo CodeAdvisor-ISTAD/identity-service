@@ -101,7 +101,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.registerRequestToUser(registerRequest);
         user.setPassword(passwordEncoder.encode(registerRequest.password()));
         user.setUuid(UUID.randomUUID().toString());
-        user.setProfileImage("users/user-icon.png");
+        user.setProfileImage("https://media.panda.engineer/api/v1/files/preview?fileName=user-profile.png");
         user.setCoverImage("users/cover.png");
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);

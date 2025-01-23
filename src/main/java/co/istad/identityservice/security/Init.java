@@ -121,18 +121,15 @@ public class Init {
                         uris.add("http://127.0.0.1:8169/login/oauth2/code/code-advisor");
                         uris.add("http://202.178.125.77:1168/login/oauth2/code/code-advisor");
                         uris.add("http://202.178.125.77:1169/login/oauth2/code/code-advisor");
-
+                        uris.add("https://code-advisors.istad.co/login/oauth2/code/code-advisor");
                         uris.add("http://202.178.125.77:8168/login/oauth2/code/code-advisor");
-
-
                     })
                     .postLogoutRedirectUris(uris -> {
                         uris.add("http://127.0.0.1:8168");
                         uris.add("http://127.0.0.1:8169");
                         uris.add("http://202.178.125.77:1168");
                         uris.add("http://202.178.125.77:1169");
-
-
+                        uris.add("https://code-advisors.istad.co");
                     })
                     .clientAuthenticationMethods(method -> {
                         method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
