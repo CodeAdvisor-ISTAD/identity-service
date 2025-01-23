@@ -149,7 +149,7 @@ public class SecurityConfig {
                                     if (isAdmin) {
                                         response.sendRedirect("http://127.0.0.1:8169/dashboard/overview");
                                     } else {
-                                        response.sendRedirect("http://127.0.0.1:8168");
+                                        response.sendRedirect(redirectUrl);
                                     }
                                 })
                                 .failureUrl("/login?error=true")
