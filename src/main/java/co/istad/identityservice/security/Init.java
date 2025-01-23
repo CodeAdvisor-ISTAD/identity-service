@@ -57,10 +57,10 @@ public class Init {
             User adminUser = new User();
             adminUser.setUuid(UUID.randomUUID().toString());
             adminUser.setUsername("admin");
-            adminUser.setEmail("mengseu2004@gmail.com");
+            adminUser.setEmail("yithsopheaktra@gmail.com");
             adminUser.setPassword(passwordEncoder.encode("qwerqwer"));
-            adminUser.setFullName("HelloBroBro");
-            adminUser.setProfileImage("avatar.png");
+            adminUser.setFullName("Yith Sopheaktra");
+            adminUser.setProfileImage("https://avatars.githubusercontent.com/u/102577536?v=4");
             adminUser.setCoverImage("cover.png");
             adminUser.setDob(LocalDate.now());
             adminUser.setGender("Male");
@@ -118,14 +118,20 @@ public class Init {
                     .redirectUris(uris -> {
                         uris.add("http://127.0.0.1:9090/login/oauth2/code/code-advisor");
                         uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
+                        uris.add("http://127.0.0.1:8169/login/oauth2/code/code-advisor");
                         uris.add("http://202.178.125.77:1168/login/oauth2/code/code-advisor");
+                        uris.add("http://202.178.125.77:1169/login/oauth2/code/code-advisor");
+
                         uris.add("http://202.178.125.77:8168/login/oauth2/code/code-advisor");
 
 
                     })
                     .postLogoutRedirectUris(uris -> {
                         uris.add("http://127.0.0.1:8168");
+                        uris.add("http://127.0.0.1:8169");
                         uris.add("http://202.178.125.77:1168");
+                        uris.add("http://202.178.125.77:1169");
+
 
                     })
                     .clientAuthenticationMethods(method -> {

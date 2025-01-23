@@ -2,7 +2,6 @@ package co.istad.identityservice.security;
 
 import co.istad.identityservice.domain.User;
 import co.istad.identityservice.features.user.UserRepository;
-import co.istad.identityservice.features.user.UserService;
 import co.istad.identityservice.security.custom.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -31,7 +29,6 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -62,7 +59,6 @@ public class SecurityConfig {
     private String codeAdvisorPort;
 
 
-
     @Bean
     WebClient.Builder webClientBuilder() {
         return WebClient.builder();
@@ -91,6 +87,7 @@ public class SecurityConfig {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
         http
+
                 .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
@@ -114,45 +111,35 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    SecurityFilterChain configureAdminSecurity(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/admin/**") // This configuration applies to admin paths
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/login").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/admin/login")
-                        .loginProcessingUrl("/admin/login")
-                        .defaultSuccessUrl("/admin/dashboard", true)
-                        .failureUrl("/admin/login?error=true")
-                )
-                .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/admin/logout"))
-                        .logoutSuccessUrl("/admin/login")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID", "SESSION")
-                )
-                .cors(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable);
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(3)
     SecurityFilterChain configureHttpSecurity(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login","/logout","/oauth2/**", "/error", "/register", "/otp/**", "/resend-otp", "/forget-password", "/reset-pwd-otp", "/reset-password", "/google", "http://localhost:8168", "/github").permitAll()
+                        .requestMatchers("/login", "/logout", "/oauth2/**", "/error", "/register", "/otp/**", "/resend-otp", "/forget-password", "/reset-pwd-otp", "/reset-password", "/google", "http://localhost:8168", "/github").permitAll()
+                        .requestMatchers("/dashboard/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
 //                        .defaultSuccessUrl("http://localhost:8168/", true)
+                                .successHandler((request, response, authentication) -> {
+                                    // Check if user has ADMIN role
+                                    boolean isAdmin = authentication.getAuthorities().stream()
+                                            .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+                                    String admin = authentication.getAuthorities().stream()
+                                            .filter(a -> a.getAuthority().equals("ADMIN"))
+                                            .map(a -> a.getAuthority())
+                                            .findFirst().orElse(null);
+
+                                    log.info("Admin: {}", admin);
+
+                                    if (isAdmin) {
+                                        response.sendRedirect("http://127.0.0.1:8169/dashboard/overview");
+                                    } else {
+                                        response.sendRedirect("http://127.0.0.1:8168");
+                                    }
+                                })
                                 .failureUrl("/login?error=true")
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -162,14 +149,29 @@ public class SecurityConfig {
                         .jwt(Customizer.withDefaults())
                 )
                 .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("http://"+codeAdvisorIp+":"+codeAdvisorPort)
+                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+//                        .logoutSuccessUrl("http://"+codeAdvisorIp+":"+codeAdvisorPort)
 //                        .logoutSuccessUrl("http://127.0.0.1:8168")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID") // Add any other cookies you need to clear
-                        .deleteCookies("SESSION")
-                        .addLogoutHandler(new SecurityContextLogoutHandler())
+                                .logoutSuccessHandler((request, response, authentication) -> {
+                                    // Check if the logged out user was an admin
+                                    boolean wasAdmin = authentication != null && authentication.getAuthorities().stream()
+                                            .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+                                    // Log the logout event
+                                    log.info("User logged out - Admin: {}", wasAdmin);
+
+                                    // Redirect based on user role
+                                    if (wasAdmin) {
+                                        response.sendRedirect("http://127.0.0.1:8169");
+                                    } else {
+                                        response.sendRedirect("http://127.0.0.1:8168");
+                                    }
+                                })
+                                .invalidateHttpSession(true)
+                                .clearAuthentication(true)
+                                .deleteCookies("JSESSIONID") // Add any other cookies you need to clear
+                                .deleteCookies("SESSION")
+                                .addLogoutHandler(new SecurityContextLogoutHandler())
                 )
 
                 .cors(AbstractHttpConfigurer::disable)
@@ -259,7 +261,7 @@ public class SecurityConfig {
         if (user1 != null) {
             claims.put("userUuid", user1.getUuid());
             claims.put("username", user1.getUsername());
-            claims.put("email", user.getAttribute("login")+ "@github.com");
+            claims.put("email", user.getAttribute("login") + "@github.com");
         }
         if (user.getAttribute("name") != null) {
             claims.put("fullName", user.getAttribute("name"));
