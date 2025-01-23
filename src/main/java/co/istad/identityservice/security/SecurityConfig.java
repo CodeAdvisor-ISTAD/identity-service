@@ -86,7 +86,7 @@ public class SecurityConfig {
 
 
         JwtIssuerAuthenticationManagerResolver authenticationManagerResolver = JwtIssuerAuthenticationManagerResolver
-                .fromTrustedIssuers("https://identity.code-advisors.istad.co");
+                .fromTrustedIssuers("http://identity.code-advisors.istad.co");
 
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
