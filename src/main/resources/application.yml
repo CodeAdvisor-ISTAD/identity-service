@@ -8,3 +8,4 @@ spring:
   cloud:
     config:
       uri: http://167.172.78.79:8888
+

@@ -62,6 +62,9 @@ public class SecurityConfig {
     @Value("${code-advisors.port}")
     private String codeAdvisorPort;
 
+    @Value("${redirectUrl.url}")
+    private String redirectUrl;
+
 
     @Bean
     WebClient.Builder webClientBuilder() {
@@ -173,7 +176,7 @@ public class SecurityConfig {
                                     if (wasAdmin) {
                                         response.sendRedirect("http://127.0.0.1:8169");
                                     } else {
-                                        response.sendRedirect("http://127.0.0.1:8168");
+                                        response.sendRedirect(redirectUrl);
                                     }
                                 })
                                 .invalidateHttpSession(true)
