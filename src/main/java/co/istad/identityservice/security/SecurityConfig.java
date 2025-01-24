@@ -65,6 +65,9 @@ public class SecurityConfig {
     @Value("${redirect.url}")
     private String redirectUrl;
 
+    @Value("${issuer.url}")
+    private String issuerUrl;
+
 
     @Bean
     WebClient.Builder webClientBuilder() {
@@ -83,7 +86,7 @@ public class SecurityConfig {
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                .issuer("https://identity.code-advisors.istad.co")
+                .issuer(issuerUrl)
                 .build();
     }
 
