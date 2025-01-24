@@ -133,30 +133,31 @@ public class SecurityConfig {
                         .requestMatchers("/dashboard/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                                .loginPage("/login")
-                                .loginProcessingUrl("/login")
-//                        .defaultSuccessUrl("http://localhost:8168/", true)
-                                .successHandler((request, response, authentication) -> {
-                                    // Check if user has ADMIN role
-                                    boolean isAdmin = authentication.getAuthorities().stream()
-                                            .anyMatch(a -> a.getAuthority().equals("ADMIN"));
-
-                                    String admin = authentication.getAuthorities().stream()
-                                            .filter(a -> a.getAuthority().equals("ADMIN"))
-                                            .map(a -> a.getAuthority())
-                                            .findFirst().orElse(null);
-
-                                    log.info("Admin: {}", admin);
-
-                                    if (isAdmin) {
-                                        response.sendRedirect("http://127.0.0.1:8169/dashboard/overview");
-                                    } else {
-                                        response.sendRedirect(redirectUrl);
-                                    }
-                                })
-                                .failureUrl("/login?error=true")
-                )
+                .formLogin(Customizer.withDefaults())
+//                .formLogin(form -> form
+//                                .loginPage("/login")
+//                                .loginProcessingUrl("/login")
+////                        .defaultSuccessUrl("http://localhost:8168/", true)
+//                                .successHandler((request, response, authentication) -> {
+//                                    // Check if user has ADMIN role
+//                                    boolean isAdmin = authentication.getAuthorities().stream()
+//                                            .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+//
+//                                    String admin = authentication.getAuthorities().stream()
+//                                            .filter(a -> a.getAuthority().equals("ADMIN"))
+//                                            .map(a -> a.getAuthority())
+//                                            .findFirst().orElse(null);
+//
+//                                    log.info("Admin: {}", admin);
+//
+//                                    if (isAdmin) {
+//                                        response.sendRedirect("http://127.0.0.1:8169/dashboard/overview");
+//                                    } else {
+//                                        response.sendRedirect(redirectUrl);
+//                                    }
+//                                })
+//                                .failureUrl("/login?error=true")
+//                )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                 )
