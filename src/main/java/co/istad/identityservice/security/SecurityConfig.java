@@ -83,10 +83,30 @@ public class SecurityConfig {
     }
 
 
+//    @Bean
+//    AuthorizationServerSettings authorizationServerSettings() {
+//        return AuthorizationServerSettings.builder()
+//                .issuer(issuerUrl)
+//                .build();
+//    }
+
     @Bean
-    AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder()
-                .issuer(issuerUrl)
+    AuthorizationServerSettings authorizationServerSettings(@Value("${spring.profiles.active}") String profile) {
+
+        String issuerUri = "http://localhost:9090";
+
+        if (profile.equalsIgnoreCase("dev")) {
+            issuerUri = "http://202.178.125.77:9090";
+
+        } else if (profile.equalsIgnoreCase("deth")) {
+            issuerUri = "https://identity.code-advisors.istad.co";
+        }
+
+
+        return AuthorizationServerSettings
+                .builder()
+                .issuer(issuerUri)
+                .tokenRevocationEndpoint("/oauth2/revoke")
                 .build();
     }
 
