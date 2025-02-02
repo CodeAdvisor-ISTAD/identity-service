@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -90,64 +92,126 @@ public class Init {
 
     @PostConstruct
     void initOAuth2() {
+        if (clientRepository.count() < 1) {
+            // Existing client for development
+            registerClient(
+                    "code-advisor-dev",
+                    "qwerqwer",
+                    Arrays.asList(
+                            "http://127.0.0.1:8168/login/oauth2/code/code-advisor",
+                            "http://127.0.0.1:8169/login/oauth2/code/code-advisor"
+                    )
+            );
 
-        if(clientRepository.count() < 1) {
-
-            TokenSettings tokenSettings = TokenSettings.builder()
-                    .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                    .accessTokenTimeToLive(Duration.ofMinutes(1))
-                    .build();
-
-            ClientSettings clientSettings = ClientSettings.builder()
-//                    .requireProofKey(true)
-                    .requireAuthorizationConsent(false)
-                    .build();
-
-            var web = RegisteredClient.withId(UUID.randomUUID().toString())
-                    .clientId("code-advisor")
-                    .clientSecret(passwordEncoder.encode("qwerqwer")) // store in secret manager
-                    .scopes(scopes -> {
-                        scopes.add("ADMIN");
-                        scopes.add("USER");
-                        scopes.add("SCOPE_ADMIN");
-                        scopes.add("SCOPE_USER");
-                        scopes.add(OidcScopes.OPENID);
-                        scopes.add(OidcScopes.PROFILE);
-                        scopes.add(OidcScopes.EMAIL);
-                    })
-                    .redirectUris(uris -> {
-                        uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
-                        uris.add("http://127.0.0.1:8169/login/oauth2/code/code-advisor");
-                        uris.add("http://202.178.125.77:1168/login/oauth2/code/code-advisor");
-                        uris.add("http://202.178.125.77:1169/login/oauth2/code/code-advisor");
-                        uris.add("https://code-advisors.istad.co/login/oauth2/code/code-advisor");
-                        uris.add("http://202.178.125.77:8168/login/oauth2/code/code-advisor");
-                    })
-                    .postLogoutRedirectUris(uris -> {
-                        uris.add("http://127.0.0.1:8168");
-                        uris.add("http://127.0.0.1:8169");
-                        uris.add("http://202.178.125.77:1168");
-                        uris.add("http://202.178.125.77:1169");
-                        uris.add("https://code-advisors.istad.co");
-                    })
-                    .clientAuthenticationMethods(method -> {
-                        method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
-                    }) //TODO: grant_type:client_credentials, client_id & client_secret, redirect_uri
-                    .authorizationGrantTypes(grantTypes -> {
-                        grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
-                        grantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
-                    })
-                    .clientSettings(clientSettings)
-                    .tokenSettings(tokenSettings)
-                    .build();
-
-            RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("codeadvisor");
-
-            if (registeredClient == null) {
-                jpaRegisteredClientRepository.save(web);
-            }
+            // New client for production
+            registerClient(
+                    "code-advisor-prod",
+                    "prod-secret", // Use a different secret for production
+                    Arrays.asList(
+                            "https://code-advisors.istad.co/login/oauth2/code/code-advisor"
+                    )
+            );
         }
-
     }
+
+    private void registerClient(String clientId, String clientSecret, List<String> redirectUris) {
+        TokenSettings tokenSettings = TokenSettings.builder()
+                .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                .accessTokenTimeToLive(Duration.ofHours(1)) // Longer token lifetime for production
+                .build();
+
+        ClientSettings clientSettings = ClientSettings.builder()
+                .requireAuthorizationConsent(false)
+                .build();
+
+        var client = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId(clientId)
+                .clientSecret(passwordEncoder.encode(clientSecret))
+                .scopes(scopes -> {
+                    scopes.add("ADMIN");
+                    scopes.add("USER");
+                    scopes.add(OidcScopes.OPENID);
+                    scopes.add(OidcScopes.PROFILE);
+                    scopes.add(OidcScopes.EMAIL);
+                })
+                .redirectUris(uris -> uris.addAll(redirectUris))
+                .clientAuthenticationMethods(method -> {
+                    method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                })
+                .authorizationGrantTypes(grantTypes -> {
+                    grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                    grantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
+                })
+                .clientSettings(clientSettings)
+                .tokenSettings(tokenSettings)
+                .build();
+
+        RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId(clientId);
+        if (registeredClient == null) {
+            jpaRegisteredClientRepository.save(client);
+        }
+    }
+
+//    @PostConstruct
+//    void initOAuth2() {
+//
+//        if(clientRepository.count() < 1) {
+//
+//            TokenSettings tokenSettings = TokenSettings.builder()
+//                    .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+//                    .accessTokenTimeToLive(Duration.ofMinutes(1))
+//                    .build();
+//
+//            ClientSettings clientSettings = ClientSettings.builder()
+////                    .requireProofKey(true)
+//                    .requireAuthorizationConsent(false)
+//                    .build();
+//
+//            var web = RegisteredClient.withId(UUID.randomUUID().toString())
+//                    .clientId("code-advisor")
+//                    .clientSecret(passwordEncoder.encode("qwerqwer")) // store in secret manager
+//                    .scopes(scopes -> {
+//                        scopes.add("ADMIN");
+//                        scopes.add("USER");
+//                        scopes.add("SCOPE_ADMIN");
+//                        scopes.add("SCOPE_USER");
+//                        scopes.add(OidcScopes.OPENID);
+//                        scopes.add(OidcScopes.PROFILE);
+//                        scopes.add(OidcScopes.EMAIL);
+//                    })
+//                    .redirectUris(uris -> {
+//                        uris.add("http://127.0.0.1:8168/login/oauth2/code/code-advisor");
+//                        uris.add("http://127.0.0.1:8169/login/oauth2/code/code-advisor");
+//                        uris.add("http://202.178.125.77:1168/login/oauth2/code/code-advisor");
+//                        uris.add("http://202.178.125.77:1169/login/oauth2/code/code-advisor");
+//                        uris.add("https://code-advisors.istad.co/login/oauth2/code/code-advisor");
+//                        uris.add("http://202.178.125.77:8168/login/oauth2/code/code-advisor");
+//                    })
+//                    .postLogoutRedirectUris(uris -> {
+//                        uris.add("http://127.0.0.1:8168");
+//                        uris.add("http://127.0.0.1:8169");
+//                        uris.add("http://202.178.125.77:1168");
+//                        uris.add("http://202.178.125.77:1169");
+//                        uris.add("https://code-advisors.istad.co");
+//                    })
+//                    .clientAuthenticationMethods(method -> {
+//                        method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+//                    }) //TODO: grant_type:client_credentials, client_id & client_secret, redirect_uri
+//                    .authorizationGrantTypes(grantTypes -> {
+//                        grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+//                        grantTypes.add(AuthorizationGrantType.REFRESH_TOKEN);
+//                    })
+//                    .clientSettings(clientSettings)
+//                    .tokenSettings(tokenSettings)
+//                    .build();
+//
+//            RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("codeadvisor");
+//
+//            if (registeredClient == null) {
+//                jpaRegisteredClientRepository.save(web);
+//            }
+//        }
+//
+//    }
 
 }
