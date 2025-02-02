@@ -95,7 +95,7 @@ public class Init {
         if (clientRepository.count() < 1) {
             // Existing client for development
             registerClient(
-                    "code-advisor-dev",
+                    "code-advisor",
                     "qwerqwer",
                     Arrays.asList(
                             "http://127.0.0.1:8168/login/oauth2/code/code-advisor",
@@ -108,7 +108,7 @@ public class Init {
                     "code-advisor-prod",
                     "prod-secret", // Use a different secret for production
                     Arrays.asList(
-                            "https://code-advisors.istad.co/login/oauth2/code/code-advisor"
+                            "https://code-advisors.istad.co/login/oauth2/code/code-advisor-prod"
                     )
             );
         }
