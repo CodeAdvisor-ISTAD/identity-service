@@ -97,6 +97,7 @@ public class SecurityConfig {
             issuerUrl = "https://127.0.0.1:9090";
 
         log.info("Issuer URL After: {}", issuerUrl);
+
         return AuthorizationServerSettings
                 .builder()
                 .issuer(issuerUrl)
