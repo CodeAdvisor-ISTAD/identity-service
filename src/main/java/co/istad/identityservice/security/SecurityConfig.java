@@ -129,7 +129,9 @@ public class SecurityConfig {
     SecurityFilterChain configureHttpSecurity(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/logout", "/oauth2/**", "/error", "/register", "/otp/**", "/resend-otp", "/forget-password", "/reset-pwd-otp", "/reset-password", "/google", "http://localhost:8168", "/github","/actuator/**").permitAll()
+                        .requestMatchers("/login", "/logout", "/oauth2/**", "/error", "/register", "/otp/**",
+                                "/resend-otp", "/forget-password", "/reset-pwd-otp", "/reset-password", "/google",
+                                "http://localhost:8168", "/github","/actuator/**", "https://code-advisors.istad.co").permitAll()
                         .requestMatchers("/dashboard/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
