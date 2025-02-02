@@ -68,6 +68,9 @@ public class SecurityConfig {
     @Value("${issuer.url}")
     private String issuerUrl;
 
+    @Value("${spring.profiles.active}")
+    private String profile;
+
 
     @Bean
     WebClient.Builder webClientBuilder() {
@@ -85,7 +88,14 @@ public class SecurityConfig {
 
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder()
+        log.info("Profile Running on: {}", profile);
+
+        if (profile.equalsIgnoreCase("prod"))
+            issuerUrl = "https://identity.code-advisors.istad.co";
+        else if (profile.equalsIgnoreCase("dev"))
+            issuerUrl = "https://127.0.0.1:9090";
+        return AuthorizationServerSettings
+                .builder()
                 .issuer(issuerUrl)
                 .build();
     }
