@@ -89,11 +89,14 @@ public class SecurityConfig {
     @Bean
     AuthorizationServerSettings authorizationServerSettings() {
         log.info("Profile Running on: {}", profile);
+        log.info("Issuer URL Before: {}", issuerUrl);
 
         if (profile.equalsIgnoreCase("prod"))
             issuerUrl = "https://identity.code-advisors.istad.co";
         else if (profile.equalsIgnoreCase("dev"))
             issuerUrl = "https://127.0.0.1:9090";
+
+        log.info("Issuer URL After: {}", issuerUrl);
         return AuthorizationServerSettings
                 .builder()
                 .issuer(issuerUrl)
