@@ -163,7 +163,7 @@ public class Init {
                     .build();
 
             ClientSettings clientSettings = ClientSettings.builder()
-//                    .requireProofKey(true)
+                    .requireProofKey(true)
                     .requireAuthorizationConsent(false)
                     .build();
 
