@@ -86,23 +86,23 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    AuthorizationServerSettings authorizationServerSettings() {
-        log.info("Profile Running on: {}", profile);
-        log.info("Issuer URL Before: {}", issuerUrl);
-
-        if (profile.equalsIgnoreCase("prod"))
-            issuerUrl = "https://identity.code-advisors.istad.co";
-        else if (profile.equalsIgnoreCase("dev"))
-            issuerUrl = "http://127.0.0.1:9090";
-
-        log.info("Issuer URL After: {}", issuerUrl);
-
-        return AuthorizationServerSettings
-                .builder()
-                .issuer(issuerUrl)
-                .build();
-    }
+//    @Bean
+//    AuthorizationServerSettings authorizationServerSettings() {
+//        log.info("Profile Running on: {}", profile);
+//        log.info("Issuer URL Before: {}", issuerUrl);
+//
+//        if (profile.equalsIgnoreCase("prod"))
+//            issuerUrl = "https://identity.code-advisors.istad.co";
+//        else if (profile.equalsIgnoreCase("dev"))
+//            issuerUrl = "http://127.0.0.1:9090";
+//
+//        log.info("Issuer URL After: {}", issuerUrl);
+//
+//        return AuthorizationServerSettings
+//                .builder()
+//                .issuer(issuerUrl)
+//                .build();
+//    }
 
 
 
@@ -213,35 +213,35 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
-        return context -> {
-            Authentication authentication = context.getPrincipal();
-            Object principal = authentication.getPrincipal();
-
-            if (context.getTokenType().getValue().equals("id_token")) {
-                if (principal instanceof CustomUserDetails customUserDetails) {
-                    addCustomUserClaims(context, customUserDetails);
-                } else if (principal instanceof DefaultOidcUser oidcUser) {
-                    addGoogleUserClaims(context, oidcUser);
-                } else if (principal instanceof DefaultOAuth2User oauth2User) {
-                    addGithubUserClaims(context, oauth2User);
-                }
-            }
-
-            if (context.getTokenType().getValue().equals("access_token")) {
-                addStandardClaims(context, authentication);
-
-                if (principal instanceof CustomUserDetails customUserDetails) {
-                    addCustomUserClaims(context, customUserDetails);
-                } else if (principal instanceof DefaultOidcUser oidcUser) {
-                    addGoogleUserClaims(context, oidcUser);
-                } else if (principal instanceof DefaultOAuth2User oauth2User) {
-                    addGithubUserClaims(context, oauth2User);
-                }
-            }
-        };
-    }
+//    @Bean
+//    OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
+//        return context -> {
+//            Authentication authentication = context.getPrincipal();
+//            Object principal = authentication.getPrincipal();
+//
+//            if (context.getTokenType().getValue().equals("id_token")) {
+//                if (principal instanceof CustomUserDetails customUserDetails) {
+//                    addCustomUserClaims(context, customUserDetails);
+//                } else if (principal instanceof DefaultOidcUser oidcUser) {
+//                    addGoogleUserClaims(context, oidcUser);
+//                } else if (principal instanceof DefaultOAuth2User oauth2User) {
+//                    addGithubUserClaims(context, oauth2User);
+//                }
+//            }
+//
+//            if (context.getTokenType().getValue().equals("access_token")) {
+//                addStandardClaims(context, authentication);
+//
+//                if (principal instanceof CustomUserDetails customUserDetails) {
+//                    addCustomUserClaims(context, customUserDetails);
+//                } else if (principal instanceof DefaultOidcUser oidcUser) {
+//                    addGoogleUserClaims(context, oidcUser);
+//                } else if (principal instanceof DefaultOAuth2User oauth2User) {
+//                    addGithubUserClaims(context, oauth2User);
+//                }
+//            }
+//        };
+//    }
 
     private void addStandardClaims(JwtEncodingContext context, Authentication authentication) {
         Set<String> scopes = new HashSet<>(context.getAuthorizedScopes());

@@ -159,7 +159,7 @@ public class Init {
 
             TokenSettings tokenSettings = TokenSettings.builder()
                     .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                    .accessTokenTimeToLive(Duration.ofMinutes(1))
+                    .accessTokenTimeToLive(Duration.ofHours(1))
                     .build();
 
             ClientSettings clientSettings = ClientSettings.builder()
@@ -205,7 +205,7 @@ public class Init {
                     .tokenSettings(tokenSettings)
                     .build();
 
-            RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("codeadvisor");
+            RegisteredClient registeredClient = jpaRegisteredClientRepository.findByClientId("code-advisor");
 
             if (registeredClient == null) {
                 jpaRegisteredClientRepository.save(web);
