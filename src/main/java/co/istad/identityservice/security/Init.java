@@ -196,6 +196,7 @@ public class Init {
                     })
                     .clientAuthenticationMethods(method -> {
                         method.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                        method.add(ClientAuthenticationMethod.CLIENT_SECRET_POST);
                     }) //TODO: grant_type:client_credentials, client_id & client_secret, redirect_uri
                     .authorizationGrantTypes(grantTypes -> {
                         grantTypes.add(AuthorizationGrantType.AUTHORIZATION_CODE);
