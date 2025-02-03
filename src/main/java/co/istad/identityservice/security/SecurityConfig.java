@@ -145,11 +145,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/logout", "/oauth2/**", "/error", "/register", "/otp/**",
                                 "/resend-otp", "/forget-password", "/reset-pwd-otp", "/reset-password", "/google",
-                                "http://localhost:8168", "/github","/actuator/**", "https://code-advisors.istad.co").permitAll()
+                                "http://localhost:8168", "/github","/actuator/**", "https://code-advisors.istad.co",
+                                "/test/**").permitAll()
                         .requestMatchers("/dashboard/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
-//                .formLogin(Customizer.withDefaults())
+//                .formLogin(Customizer.withDefaults())g
                 .formLogin(form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
