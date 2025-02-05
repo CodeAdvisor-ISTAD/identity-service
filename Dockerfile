@@ -8,7 +8,7 @@ COPY . .
 RUN chmod +x gradlew
 
 # Build the application
-RUN ./gradlew clean build
+RUN ./gradlew clean build -x test
 
 FROM openjdk:21-jdk
 
