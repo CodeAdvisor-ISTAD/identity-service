@@ -214,35 +214,35 @@ public class SecurityConfig {
     }
 
 
-//    @Bean
-//    OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
-//        return context -> {
-//            Authentication authentication = context.getPrincipal();
-//            Object principal = authentication.getPrincipal();
-//
-//            if (context.getTokenType().getValue().equals("id_token")) {
-//                if (principal instanceof CustomUserDetails customUserDetails) {
-//                    addCustomUserClaims(context, customUserDetails);
-//                } else if (principal instanceof DefaultOidcUser oidcUser) {
-//                    addGoogleUserClaims(context, oidcUser);
-//                } else if (principal instanceof DefaultOAuth2User oauth2User) {
-//                    addGithubUserClaims(context, oauth2User);
-//                }
-//            }
-//
-//            if (context.getTokenType().getValue().equals("access_token")) {
-//                addStandardClaims(context, authentication);
-//
-//                if (principal instanceof CustomUserDetails customUserDetails) {
-//                    addCustomUserClaims(context, customUserDetails);
-//                } else if (principal instanceof DefaultOidcUser oidcUser) {
-//                    addGoogleUserClaims(context, oidcUser);
-//                } else if (principal instanceof DefaultOAuth2User oauth2User) {
-//                    addGithubUserClaims(context, oauth2User);
-//                }
-//            }
-//        };
-//    }
+    @Bean
+    OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
+        return context -> {
+            Authentication authentication = context.getPrincipal();
+            Object principal = authentication.getPrincipal();
+
+            if (context.getTokenType().getValue().equals("id_token")) {
+                if (principal instanceof CustomUserDetails customUserDetails) {
+                    addCustomUserClaims(context, customUserDetails);
+                } else if (principal instanceof DefaultOidcUser oidcUser) {
+                    addGoogleUserClaims(context, oidcUser);
+                } else if (principal instanceof DefaultOAuth2User oauth2User) {
+                    addGithubUserClaims(context, oauth2User);
+                }
+            }
+
+            if (context.getTokenType().getValue().equals("access_token")) {
+                addStandardClaims(context, authentication);
+
+                if (principal instanceof CustomUserDetails customUserDetails) {
+                    addCustomUserClaims(context, customUserDetails);
+                } else if (principal instanceof DefaultOidcUser oidcUser) {
+                    addGoogleUserClaims(context, oidcUser);
+                } else if (principal instanceof DefaultOAuth2User oauth2User) {
+                    addGithubUserClaims(context, oauth2User);
+                }
+            }
+        };
+    }
 
     private void addStandardClaims(JwtEncodingContext context, Authentication authentication) {
         Set<String> scopes = new HashSet<>(context.getAuthorizedScopes());
